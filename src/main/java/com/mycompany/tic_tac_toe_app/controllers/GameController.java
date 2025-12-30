@@ -1,5 +1,6 @@
-package com.mycompany.tic_tac_toe_app.controls;
+package com.mycompany.tic_tac_toe_app.controllers;
 
+import com.mycompany.tic_tac_toe_app.model.service.XOGameLogic;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -34,9 +35,8 @@ public class GameController implements Initializable, Runnable {
     private Button _10;
     @FXML
     private Button _02;
-    
-    
-        Socket socket;
+
+    Socket socket;
     BufferedReader br;
     PrintStream ps;
     Thread th;

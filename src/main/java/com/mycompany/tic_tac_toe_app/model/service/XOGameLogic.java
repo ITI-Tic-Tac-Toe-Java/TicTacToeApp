@@ -1,4 +1,4 @@
-package com.mycompany.tic_tac_toe_app.controls;
+package com.mycompany.tic_tac_toe_app.model.service;
 
 public class XOGameLogic {
 
