@@ -1,5 +1,7 @@
 package com.mycompany.tic_tac_toe_app.model.service;
 
+import java.util.Random;
+
 public class XOGameLogic {
 
     public static final int EMPTY = 0;
@@ -42,5 +44,30 @@ public class XOGameLogic {
     public void reset() {
         board = new int[3][3];
         stepCount = 0;
+    }
+
+    public String getEmptyPos() {
+        while (!isDraw() && !checkWin(1) && !checkWin(2)) {
+            Random r = new Random();
+            int random = r.nextInt(9);
+            int row = random / 3;
+            int col = random % 3;
+            /*
+            [0] [1] [2]
+            [0] [1] [2]
+            [0] [1] [2]
+             */
+            if (board[row][col] == 0) {
+                return row + "," + col;
+            }
+        }
+//        for (int i = 0; i < 3; i++) {
+//            for (int j = 0; j < 3; j++) {
+//                if (board[i][j] == 0) {
+//                    return i + "," + j;
+//                }
+//            }
+//        }
+        return "";
     }
 }
