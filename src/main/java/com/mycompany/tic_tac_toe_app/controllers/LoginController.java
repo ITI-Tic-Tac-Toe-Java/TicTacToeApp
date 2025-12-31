@@ -22,18 +22,16 @@ import javafx.scene.text.Text;
  *
  * @author thaowpstasaiid
  */
-public class RegisterController implements Initializable {
+public class LoginController implements Initializable {
 
     @FXML
     private TextField username;
     @FXML
     private TextField password;
     @FXML
-    private TextField confirmPassowrd;
+    private Button signInBtn;
     @FXML
-    private Button signUpBtn;
-    @FXML
-    private Text signIn;
+    private Text registerLink;
 
     /**
      * Initializes the controller class.
@@ -44,13 +42,13 @@ public class RegisterController implements Initializable {
     }
 
     @FXML
-    private void signUp(ActionEvent event) {
+    private void signIn(ActionEvent event) {
     }
 
     @FXML
-    private void NavigateToSignIn(MouseEvent event) {
+    private void NavigateToRegister(MouseEvent event) {
         try {
-            App.setRoot("FXMLs/login");
+            App.setRoot("FXMLs/register");
         } catch (IOException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error in Loading Screen");
