@@ -4,14 +4,13 @@ import com.mycompany.tic_tac_toe_app.controllers.GameController;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.model.service.XOGameLogic;
 import java.util.function.Consumer;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.util.Pair;
 
 public class ComputerGame implements GameStrategy {
 
     XOGameLogic game = new XOGameLogic();
-//    GameController controller;
+    //    GameController controller;
     Consumer<Pair<Integer, Integer>> handleButton;
 
     public ComputerGame(Consumer<Pair<Integer, Integer>> handleButton) {
@@ -41,7 +40,6 @@ public class ComputerGame implements GameStrategy {
             int c = Integer.parseInt(rc[1]);
 
             game.makeMove(r, c, 2);
-
             handleButton.accept(new Pair(r, c));
 
 //            Button btn = controller.getButton(r, c);
