@@ -36,7 +36,7 @@ public class GameController implements Initializable, Runnable {
     private Button _02;
     
     
-        Socket socket;
+    Socket socket;
     BufferedReader br;
     PrintStream ps;
     Thread th;
