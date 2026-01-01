@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.text.Text?>
+
+<SplitPane dividerPositions="0.5" prefHeight="450.0" prefWidth="700.0" styleClass="no-divider" stylesheets="@../../../../styles/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tic_tac_toe_app.controllers.LoginController">
+    <items>
+        
+        <StackPane>
+            <children>
+                <VBox alignment="CENTER_LEFT" maxWidth="350.0" spacing="5.0">
+                    <children>
+                        <Label alignment="CENTER" contentDisplay="CENTER" text="Welcome Back" textAlignment="CENTER">
+                            <font>
+                                <Font size="44.0" />
+                            </font>
+                        </Label>
+                        <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Please Sign In to continue." textAlignment="CENTER" textFill="#225577" />
+                        
+                        <Label text="Username">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                            <padding>
+                                <Insets top="30.0" />
+                            </padding>
+                        </Label>
+                        <TextField fx:id="username" promptText="Username" stylesheets="@../../../../styles/style.css" />
+                        
+                        <Label text="Password">
+                            <font>
+                                <Font size="14.0" />
+                            </font>
+                            <padding>
+                                <Insets top="15.0" />
+                            </padding>
+                        </Label>
+                        <PasswordField fx:id="password" promptText="Password" stylesheets="@../../../../styles/style.css" />
+                        
+                        <VBox alignment="CENTER">
+                            <children>
+                                <Button fx:id="signInBtn" alignment="CENTER" mnemonicParsing="false" onAction="#signIn" prefHeight="35.0" prefWidth="120.0" styleClass="rounded-btn" stylesheets="@../../../../styles/style.css" text="Sign In" textAlignment="CENTER">
+                                    <font>
+                                        <Font size="14.0" />
+                                    </font>
+                                    <VBox.margin>
+                                        <Insets top="30.0" />
+                                    </VBox.margin>
+                                </Button>
+                            </children>
+                        </VBox>
+
+                        <HBox alignment="CENTER" prefHeight="40.0" prefWidth="200.0">
+                            <children>
+                                <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Don't have an Account?">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets right="5.0" />
+                                    </HBox.margin>
+                                </Text>
+                                <Text fx:id="registerLink" fill="#225577" onMouseClicked="#NavigateToRegister" strokeType="OUTSIDE" strokeWidth="0.0" text="Register">
+                                    <font>
+                                        <Font size="12.0" />
+                                    </font>
+                                    <HBox.margin>
+                                        <Insets />
+                                    </HBox.margin>
+                                </Text>
+                            </children>
+                            <VBox.margin>
+                                <Insets top="15.0" />
+                            </VBox.margin>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+                    </padding>
+                </VBox>
+            </children>
+        </StackPane>
+        
+        <StackPane style="-fx-background-color: #f4f4f4;">
+            <children>
+                <ImageView fitHeight="250.0" fitWidth="250.0" pickOnBounds="true" preserveRatio="true">
+                    <image>
+                        <Image url="@../../../../images/Logo.png" />
+                    </image>
+                </ImageView>
+            </children>
+        </StackPane>
+        
+    </items>
+</SplitPane>
