@@ -1,7 +1,0 @@
-com\mycompany\tic_tac_toe_app\controls\XOGameLogic.class
-com\mycompany\tic_tac_toe_app\controllers\LoginController.class
-com\mycompany\tic_tac_toe_app\App.class
-com\mycompany\tic_tac_toe_app\controllers\SavedGamesController.class
-module-info.class
-com\mycompany\tic_tac_toe_app\controls\GameController.class
-com\mycompany\tic_tac_toe_app\controllers\RegisterController.class
