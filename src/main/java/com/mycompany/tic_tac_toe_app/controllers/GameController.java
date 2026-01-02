@@ -1,5 +1,6 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
+import com.mycompany.tic_tac_toe_app.App;
 import com.mycompany.tic_tac_toe_app.model.service.XOGameLogic;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -204,15 +205,13 @@ public class GameController implements Initializable, Runnable {
     @FXML
     private void handleBack() {
         try {
-            Parent menuRoot = FXMLLoader.load(
-                    getClass().getResource("com/mycompany/tic_tac_toe_app/fxml/menu.fxml")
-            );
-
-            Scene scene = resultPane.getScene();
-            scene.setRoot(menuRoot);
-
-        } catch (IOException e) {
-            e.printStackTrace();
+            App.setRoot("fxml/menu");
+        } catch (IOException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error in Loading Screen");
+            alert.setHeaderText(null);
+            alert.setContentText(ex.getLocalizedMessage());
+            alert.showAndWait();
         }
     }
 
