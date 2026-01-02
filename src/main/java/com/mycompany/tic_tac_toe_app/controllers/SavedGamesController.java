@@ -4,12 +4,17 @@
  */
 package com.mycompany.tic_tac_toe_app.controllers;
 
+import com.mycompany.tic_tac_toe_app.App;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.ListView;
 import javafx.beans.binding.Bindings;
+import javafx.event.ActionEvent;
+import javafx.scene.control.Alert;
+import javafx.scene.input.MouseEvent;
 
 /**
  * FXML Controller class
@@ -42,5 +47,22 @@ public class SavedGamesController implements Initializable {
                         .multiply(listView.getFixedCellSize())
                         .add(2)
         );
+    }
+
+    @FXML
+    private void GoToSavedMatch(MouseEvent event) {
+        try {
+            App.setRoot("fxml/menu");
+        } catch (IOException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error in Loading Screen");
+            alert.setHeaderText(null);
+            alert.setContentText(ex.getLocalizedMessage());
+            alert.showAndWait();
+        }
+    }
+
+    @FXML
+    private void backToMenu(ActionEvent event) {
     }
 }
