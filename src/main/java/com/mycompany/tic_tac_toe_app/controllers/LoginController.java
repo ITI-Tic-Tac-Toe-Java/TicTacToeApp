@@ -8,51 +8,47 @@ import com.mycompany.tic_tac_toe_app.App;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ListView;
-import javafx.beans.binding.Bindings;
-import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
+import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.text.Text;
 
 /**
  * FXML Controller class
  *
  * @author thaowpstasaiid
  */
-public class SavedGamesController implements Initializable {
+public class LoginController implements Initializable {
 
     @FXML
-    private ListView<String> listView;
+    private TextField username;
+    @FXML
+    private TextField password;
+    @FXML
+    private Button signInBtn;
+    @FXML
+    private Text registerLink;
 
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Your existing code to add items
-        listView.getItems().addAll(
-                "Game 1",
-                "Game 2",
-                "Game 3",
-                "Game 4",
-                "Row 5"
-        );
-
-        listView.setFixedCellSize(40);
-
-        listView.prefHeightProperty().bind(
-                Bindings.size(listView.getItems())
-                        .multiply(listView.getFixedCellSize())
-                        .add(2)
-        );
+        // TODO
     }
 
     @FXML
-    private void GoToSavedMatch(MouseEvent event) {
+    private void signIn(ActionEvent event) {
+    }
+
+    @FXML
+    private void NavigateToRegister(MouseEvent event) {
         try {
-            App.setRoot("fxml/menu");
+            App.setRoot("fxml/register");
         } catch (IOException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error in Loading Screen");
@@ -60,9 +56,5 @@ public class SavedGamesController implements Initializable {
             alert.setContentText(ex.getLocalizedMessage());
             alert.showAndWait();
         }
-    }
-
-    @FXML
-    private void backToMenu(ActionEvent event) {
     }
 }

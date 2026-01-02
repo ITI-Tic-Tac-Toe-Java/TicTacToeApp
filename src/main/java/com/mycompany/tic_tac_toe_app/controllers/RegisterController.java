@@ -4,11 +4,14 @@
  */
 package com.mycompany.tic_tac_toe_app.controllers;
 
+import com.mycompany.tic_tac_toe_app.App;
+import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
@@ -38,7 +41,7 @@ public class RegisterController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // TODO
-    }    
+    }
 
     @FXML
     private void signUp(ActionEvent event) {
@@ -46,6 +49,14 @@ public class RegisterController implements Initializable {
 
     @FXML
     private void NavigateToSignIn(MouseEvent event) {
+        try {
+            App.setRoot("fxml/login");
+        } catch (IOException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error in Loading Screen");
+            alert.setHeaderText(null);
+            alert.setContentText(ex.getLocalizedMessage());
+            alert.showAndWait();
+        }
     }
-    
 }

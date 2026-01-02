@@ -1,46 +1,112 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
-import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
-import com.mycompany.tic_tac_toe_app.model.service.computer.ComputerGame;
-import com.mycompany.tic_tac_toe_app.model.service.local_multiplay.LocalGame;
+import com.mycompany.tic_tac_toe_app.App;
+import com.mycompany.tic_tac_toe_app.model.service.XOGameLogic;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintStream;
+import java.net.Socket;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
-import javafx.util.Pair;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 
-public class GameController implements Initializable {
+public class GameController implements Initializable, Runnable {
 
     @FXML
     private Button _00;
     @FXML
     private Button _01;
     @FXML
-    private Button _02;
-    @FXML
-    private Button _10;
-    @FXML
-    private Button _11;
-    @FXML
-    private Button _12;
-    @FXML
-    private Button _20;
+    private Button _22;
     @FXML
     private Button _21;
     @FXML
-    private Button _22;
+    private Button _12;
+    @FXML
+    private Button _11;
+    @FXML
+    private Button _20;
+    @FXML
+    private Button _10;
+    @FXML
+    private Button _02;
 
-    private GameStrategy game;
+    @FXML
+    private VBox resultPane;
 
-    private GameType currentMode = GameType.COMPUTER;
+    @FXML
+    private ImageView resultGif;
 
-    public enum GameType {
-        COMPUTER, LOCAL, SERVER
+    @FXML
+    private Label resultLabel;
+
+    Socket socket;
+    BufferedReader br;
+    PrintStream ps;
+    Thread th;
+
+    XOGameLogic game = new XOGameLogic();
+
+    boolean myTurn = false;
+    String mySymbol;
+
+    @Override
+    public void initialize(URL url, ResourceBundle rb) {
+        try {
+            socket = new Socket("127.0.0.1", 5008);
+            br = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            ps = new PrintStream(socket.getOutputStream());
+
+            th = new Thread(this);
+            th.start();
+
+        } catch (IOException ex) {
+            showAlert("Server", "Could't connect to server");
+        }
     }
 
-    public Button getButton(int r, int c) {
+    @Override
+    public void run() {
+        try {
+            mySymbol = br.readLine();
+            myTurn = mySymbol.equals("X");
+
+            while (true) {
+                String msg = br.readLine();
+                if (msg == null) {
+                    break;
+                }
+
+                String[] data = msg.split(",");
+                int r = Integer.parseInt(data[0]);
+                int c = Integer.parseInt(data[1]);
+                String sym = data[2];
+
+                Platform.runLater(() -> {
+                    applyMove(r, c, sym);
+                    myTurn = true;
+                });
+            }
+        } catch (IOException e) {
+            Platform.runLater(() -> showAlert("Connection", "Server disconnected")
+            );
+        }
+    }
+
+    private Button getButton(int r, int c) {
         if (r == 0 && c == 0) {
             return _00;
         }
@@ -65,40 +131,88 @@ public class GameController implements Initializable {
         if (r == 2 && c == 1) {
             return _21;
         }
-        if (r == 2 && c == 2) {
-            return _22;
-        }
-        return null;
+        return _22;
     }
 
-    @Override
-    public void initialize(URL url, ResourceBundle rb) {
-        if (currentMode == GameType.LOCAL) {
-            game = new LocalGame();
-        } else {
-            game = new ComputerGame(this::handleButton);
-        }
+    private void applyMove(int r, int c, String sym) {
+        Button btn = getButton(r, c);
+        btn.setText(sym);
+        btn.setDisable(true);
 
+        int symbol = game.getSymbol(sym);
+        game.makeMove(r, c, symbol);
+
+        if (game.checkWin(symbol)) {
+            showAlert("Win", sym + " is the winner");
+        } else if (game.isDraw()) {
+            showAlert("Draw", "Game ended with a draw");
+        }
     }
 
     @FXML
     private void handleMove(ActionEvent event) {
+        if (!myTurn) {
+            return;
+        }
+
         Button btn = (Button) event.getSource();
         String id = btn.getId();
-        game.createMove(btn, id);
-//        if (currentMode == GameType.LOCAL) {
-//            localGame.createMove(btn, id);
-//        } else if (currentMode == GameType.COMPUTER) {
-//            computerGame.createMove(btn, id);
-//        }
+
+        int r = id.charAt(1) - '0';
+        int c = id.charAt(2) - '0';
+
+        applyMove(r, c, mySymbol);
+
+        int symbol = game.getSymbol(mySymbol);
+
+        if (game.checkWin(symbol)) {
+            showResult(
+                    symbol == XOGameLogic.X ? "You Win 🎉" : "You Lose 😢",
+                    symbol == XOGameLogic.X ? "win.gif" : "lose.gif"
+            );
+            myTurn = false;
+            return;
+        }
+
+        if (game.isDraw()) {
+            showResult("It's a Draw 🤝", "draw.gif");
+            myTurn = false;
+            return;
+        }
+        ps.println(r + "," + c + "," + mySymbol);
+
+        myTurn = false;
     }
 
-    public void handleButton(Pair<Integer, Integer> index) {
-        Button btn = getButton(index.getKey(), index.getValue());
+    private void showAlert(String title, String content) {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle(title);
+        alert.setContentText(content);
+        alert.showAndWait();
+    }
 
-        if (btn != null) {
-            btn.setText("O");
-            btn.setDisable(true);
+    private void showResult(String message, String gifName) {
+        resultLabel.setText(message);
+
+        Image gif = new Image(
+                getClass().getResource("/images/" + gifName).toExternalForm()
+        );
+        resultGif.setImage(gif);
+
+        resultPane.setVisible(true);
+    }
+
+    @FXML
+    private void handleBack() {
+        try {
+            App.setRoot("fxml/menu");
+        } catch (IOException ex) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Error in Loading Screen");
+            alert.setHeaderText(null);
+            alert.setContentText(ex.getLocalizedMessage());
+            alert.showAndWait();
         }
     }
+
 }
