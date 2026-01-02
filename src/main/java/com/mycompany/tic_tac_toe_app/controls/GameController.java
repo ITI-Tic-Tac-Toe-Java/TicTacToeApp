@@ -10,9 +10,16 @@ import java.util.ResourceBundle;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.VBox;
 
 public class GameController implements Initializable, Runnable {
 
@@ -34,8 +41,16 @@ public class GameController implements Initializable, Runnable {
     private Button _10;
     @FXML
     private Button _02;
-    
-    
+
+    @FXML
+    private VBox resultPane;
+
+    @FXML
+    private ImageView resultGif;
+
+    @FXML
+    private Label resultLabel;
+
     Socket socket;
     BufferedReader br;
     PrintStream ps;
@@ -146,6 +161,22 @@ public class GameController implements Initializable, Runnable {
 
         applyMove(r, c, mySymbol);
 
+        int symbol = game.getSymbol(mySymbol);
+
+        if (game.checkWin(symbol)) {
+            showResult(
+                    symbol == XOGameLogic.X ? "You Win 🎉" : "You Lose 😢",
+                    symbol == XOGameLogic.X ? "win.gif" : "lose.gif"
+            );
+            myTurn = false;
+            return;
+        }
+
+        if (game.isDraw()) {
+            showResult("It's a Draw 🤝", "draw.gif");
+            myTurn = false;
+            return;
+        }
         ps.println(r + "," + c + "," + mySymbol);
 
         myTurn = false;
@@ -156,6 +187,32 @@ public class GameController implements Initializable, Runnable {
         alert.setTitle(title);
         alert.setContentText(content);
         alert.showAndWait();
+    }
+
+    private void showResult(String message, String gifName) {
+        resultLabel.setText(message);
+
+        Image gif = new Image(
+                getClass().getResource("/images/" + gifName).toExternalForm()
+        );
+        resultGif.setImage(gif);
+
+        resultPane.setVisible(true);
+    }
+
+    @FXML
+    private void handleBack() {
+        try {
+            Parent menuRoot = FXMLLoader.load(
+                    getClass().getResource("/com/mycompany/tic_tac_toe_app/fxml/menu.fxml")
+            );
+
+            Scene scene = resultPane.getScene();
+            scene.setRoot(menuRoot);
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
 }
