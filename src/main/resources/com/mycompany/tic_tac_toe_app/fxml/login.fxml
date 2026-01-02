@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<SplitPane dividerPositions="0.5" prefHeight="450.0" prefWidth="700.0" styleClass="no-divider" stylesheets="@../../../../styles/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tic_tac_toe_app.controllers.LoginController">
+<SplitPane dividerPositions="0.5" prefHeight="450.0" prefWidth="700.0" styleClass="no-divider" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tic_tac_toe_app.controllers.LoginController">
     <items>
         
         <StackPane>
@@ -36,7 +36,7 @@
                                 <Insets top="30.0" />
                             </padding>
                         </Label>
-                        <TextField fx:id="username" promptText="Username" stylesheets="@../../../../styles/style.css" />
+                        <TextField fx:id="username" promptText="Username" />
                         
                         <Label text="Password">
                             <font>
@@ -46,11 +46,11 @@
                                 <Insets top="15.0" />
                             </padding>
                         </Label>
-                        <PasswordField fx:id="password" promptText="Password" stylesheets="@../../../../styles/style.css" />
+                        <PasswordField fx:id="password" promptText="Password" />
                         
                         <VBox alignment="CENTER">
                             <children>
-                                <Button fx:id="signInBtn" alignment="CENTER" mnemonicParsing="false" onAction="#signIn" prefHeight="35.0" prefWidth="120.0" styleClass="rounded-btn" stylesheets="@../../../../styles/style.css" text="Sign In" textAlignment="CENTER">
+                                <Button fx:id="signInBtn" alignment="CENTER" mnemonicParsing="false" onAction="#signIn" prefHeight="35.0" prefWidth="120.0" styleClass="rounded-btn" text="Sign In" textAlignment="CENTER">
                                     <font>
                                         <Font size="14.0" />
                                     </font>
@@ -96,7 +96,7 @@
             <children>
                 <ImageView fitHeight="250.0" fitWidth="250.0" pickOnBounds="true" preserveRatio="true">
                     <image>
-                        <Image url="@../../../../images/Logo.png" />
+                        <Image url="@../images/Logo.png" />
                     </image>
                 </ImageView>
             </children>

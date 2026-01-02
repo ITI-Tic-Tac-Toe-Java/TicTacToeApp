@@ -48,7 +48,7 @@ public class LoginController implements Initializable {
     @FXML
     private void NavigateToRegister(MouseEvent event) {
         try {
-            App.setRoot("FXMLs/register");
+            App.setRoot("fxml/register");
         } catch (IOException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error in Loading Screen");

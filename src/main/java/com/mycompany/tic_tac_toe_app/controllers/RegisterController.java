@@ -50,7 +50,7 @@ public class RegisterController implements Initializable {
     @FXML
     private void NavigateToSignIn(MouseEvent event) {
         try {
-            App.setRoot("FXMLs/login");
+            App.setRoot("fxml/login");
         } catch (IOException ex) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error in Loading Screen");
