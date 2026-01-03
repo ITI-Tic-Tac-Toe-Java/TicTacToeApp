@@ -15,6 +15,9 @@ import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.input.MouseEvent;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.scene.control.ListView;
 
 /**
  * FXML Controller class
@@ -31,26 +34,28 @@ public class SavedGamesController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Your existing code to add items
-        listView.getItems().addAll(
-                "Game 1",
-                "Game 2",
-                "Game 3",
-                "Game 4",
-                "Row 5"
-        );
-
+        listView.getItems().addAll("Game 1", "Game 2", "Game 3", "Game 4", "Row 5");
         listView.setFixedCellSize(40);
-
-        listView.prefHeightProperty().bind(
-                Bindings.size(listView.getItems())
-                        .multiply(listView.getFixedCellSize())
-                        .add(2)
-        );
+        listView.prefHeightProperty().bind(Bindings.size(listView.getItems()).multiply(listView.getFixedCellSize()).add(2));
+        listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
+                    @Override
+                    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                        try {
+                            App.setRoot("fxml/game");
+                        } catch (IOException ex) {
+                            ex.printStackTrace();
+                        }
+                    }
+                });
     }
 
     @FXML
     private void GoToSavedMatch(MouseEvent event) {
+
+    }
+
+    @FXML
+    private void backToMenu(ActionEvent event) {
         try {
             App.setRoot("fxml/menu");
         } catch (IOException ex) {
@@ -60,9 +65,5 @@ public class SavedGamesController implements Initializable {
             alert.setContentText(ex.getLocalizedMessage());
             alert.showAndWait();
         }
-    }
-
-    @FXML
-    private void backToMenu(ActionEvent event) {
     }
 }

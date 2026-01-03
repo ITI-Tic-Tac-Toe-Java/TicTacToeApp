@@ -18,6 +18,7 @@ public class ComputerGame implements GameStrategy {
         // this.controller = controller;
     }
 
+    @Override
     public void createMove(Button btn, String id) {
         int r = id.charAt(1) - '0';
         int c = id.charAt(2) - '0';
@@ -51,7 +52,9 @@ public class ComputerGame implements GameStrategy {
             checkGameStatus(2);
         }
     }
+    
 
+    @Override
     public boolean checkGameStatus(int player) {
         if (game.checkWin(player)) {
             showAlert("Win", (player == 1 ? "Player X" : "Player O") + " is the winner");

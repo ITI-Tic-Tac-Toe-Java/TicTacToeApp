@@ -1,14 +1,124 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.net.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import java.net.URL?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane id="AnchorPane" prefHeight="1024.0" prefWidth="1440.0" styleClass="mainFxmlClass" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane id="AnchorPane" prefHeight="1024.0" prefWidth="1440.0" styleClass="mainFxmlClass" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tic_tac_toe_app.controllers.MenuController">
     <stylesheets>
-        <URL value="@../styles/menu.css"/>
+        <URL value="@../styles/style.css" />
     </stylesheets>
+   <children>
+      <VBox alignment="CENTER" prefHeight="1024.0" prefWidth="1440.0">
+         <children>
+            <Label alignment="CENTER" text="tic tac toe" textAlignment="CENTER">
+               <font>
+                  <Font size="51.0" />
+               </font>
+               <VBox.margin>
+                  <Insets bottom="40.0" />
+               </VBox.margin>
+            </Label>
+            <HBox>
+               <children>
+                  <Label text="Welcom">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                     <padding>
+                        <Insets right="30.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="UserName" text="User Name">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets left="540.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets bottom="30.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox>
+               <children>
+                  <Label text="Your Points:">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                     <padding>
+                        <Insets right="30.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="pointsNumber" text="300">
+                     <font>
+                        <Font name="System Bold" size="20.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets left="540.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets bottom="30.0" />
+               </VBox.margin>
+            </HBox>
+            <HBox>
+               <children>
+                  <Label text="Your Rank:">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                     <padding>
+                        <Insets right="30.0" />
+                     </padding>
+                  </Label>
+                  <Label fx:id="rankNumber" text="2">
+                     <font>
+                        <Font name="System Bold" size="24.0" />
+                     </font>
+                  </Label>
+               </children>
+               <padding>
+                  <Insets left="540.0" />
+               </padding>
+               <VBox.margin>
+                  <Insets bottom="30.0" />
+               </VBox.margin>
+            </HBox>
+            <Button fx:id="singlePlayerButton" alignment="CENTER" mnemonicParsing="false" onAction="#singlePlayerAction" prefHeight="81.0" prefWidth="363.0" styleClass="rounded-btn" text="Single Player" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="localMultiplayerButton" alignment="CENTER" layoutX="549.0" layoutY="524.0" mnemonicParsing="false" onAction="#localMultiplayerAction" prefHeight="81.0" prefWidth="363.0" styleClass="rounded-btn" text="Local Multiplayer" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="onlineMultiplayerButton" alignment="CENTER" layoutX="549.0" layoutY="584.0" mnemonicParsing="false" onAction="#onlineMultiplayerAction" prefHeight="81.0" prefWidth="363.0" styleClass="rounded-btn" text="Online Multiplayer" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="replayGame" alignment="CENTER" layoutX="549.0" layoutY="544.0" mnemonicParsing="false" onAction="#replayGameAction" prefHeight="81.0" prefWidth="363.0" styleClass="rounded-btn" text="Replay Game" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </Button>
+            <Button fx:id="logoutButton" alignment="CENTER" layoutX="549.0" layoutY="625.0" mnemonicParsing="false" onAction="#logoutAction" prefHeight="81.0" prefWidth="363.0" styleClass="rounded-btn" text="Logout" textAlignment="CENTER">
+               <VBox.margin>
+                  <Insets bottom="20.0" />
+               </VBox.margin>
+            </Button>
+         </children>
+      </VBox>
+   </children>
 </AnchorPane>

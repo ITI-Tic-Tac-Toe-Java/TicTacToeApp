@@ -9,9 +9,15 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="600.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tic_tac_toe_app.controllers.GameController">
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="678.0" prefWidth="600.0" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tic_tac_toe_app.controllers.GameController">
     <children>
+      <Button layoutX="240.0" layoutY="604.0" mnemonicParsing="false" onAction="#goBackOnClick" prefHeight="35.0" prefWidth="120.0" styleClass="rounded-btn" stylesheets="@../styles/style.css" text="Back">
+         <font>
+            <Font size="18.0" />
+         </font>
+      </Button>
         <StackPane layoutX="33.0" layoutY="33.0" prefHeight="534.0" prefWidth="534.0">
 
             <GridPane layoutX="33.0" layoutY="33.0" prefHeight="534.0" prefWidth="534.0">
@@ -43,7 +49,7 @@
 
                 <Label fx:id="resultLabel" style="-fx-text-fill: white;                   -fx-font-size: 22;                   -fx-font-weight: bold;" />
 
-                <Button onAction="#handleBack" prefWidth="120" style="-fx-background-color: red;" styleClass="rounded-btn" text="Back" />
+                
             </VBox>
         </StackPane>
 
