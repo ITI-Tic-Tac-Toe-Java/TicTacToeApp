@@ -28,6 +28,21 @@
 }
 
 .list-view .list-cell:hover {
-    -fx-background-color: #2255772d; 
+    -fx-background-color: #2255772d;
+    -fx-background-radius: 12;
+}
+
+.online-players-list {
+    -fx-max-width: 1440;
+    -fx-min-width: 1440;
+    -fx-pref-width: 1440;
+    -fx-max-height: 1024;
+    -fx-min-height: 1024;
+    -fx-pref-height: 1024;
+}
+
+.online-app-bar {
+    -fx-background-color: #46A3FF;
+    -fx-border-radius: 12;
     -fx-background-radius: 12;
 }
