@@ -16,6 +16,12 @@
     -fx-border-radius: 20;
 }
 
+.back-btn {
+    -fx-background-color: transparent;
+    -fx-text-fill: #225577;
+    -fx-font-size: 25px;
+}
+
 .list-view {
     -fx-background-color: #e1e1e1;
     -fx-background-radius: 20;
@@ -24,7 +30,7 @@
 .list-view .list-cell {
     -fx-background-color: transparent;
     -fx-padding: 10 12 10 12;
-
+    -fx-font-size: 25px;
 }
 
 .list-view .list-cell:hover {

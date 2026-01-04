@@ -17,6 +17,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.input.MouseEvent;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
 /**
@@ -34,19 +35,25 @@ public class SavedGamesController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        listView.getItems().addAll("Game 1", "Game 2", "Game 3", "Game 4", "Row 5");
-        listView.setFixedCellSize(40);
+
+//        if (listView.getItems().isEmpty()) {
+//            listView.getItems().add("No Saved Games To Show");
+//        } else {
+            listView.getItems().addAll("Game 1", "Game 2", "Game 3", "Game 4", "Game 5");
+//        }
+
         listView.prefHeightProperty().bind(Bindings.size(listView.getItems()).multiply(listView.getFixedCellSize()).add(2));
+
         listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-                    @Override
-                    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                        try {
-                            App.setRoot("fxml/game");
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                try {
+                    App.setRoot("fxml/game");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 
     @FXML
