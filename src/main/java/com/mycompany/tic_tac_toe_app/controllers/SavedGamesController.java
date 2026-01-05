@@ -5,6 +5,7 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.App;
+import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,6 +18,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.input.MouseEvent;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 
 /**
@@ -34,19 +36,29 @@ public class SavedGamesController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        listView.getItems().addAll("Game 1", "Game 2", "Game 3", "Game 4", "Row 5");
-        listView.setFixedCellSize(40);
+
+        listView.getItems().clear();
+        
+        if (ClientProtocol.savedGamesList.isEmpty()) {
+            listView.getItems().add("No Saved Games To Show");
+            listView.setDisable(true);
+        } else {
+            listView.setDisable(false);
+            listView.getItems().addAll(ClientProtocol.savedGamesList);
+        }
+
         listView.prefHeightProperty().bind(Bindings.size(listView.getItems()).multiply(listView.getFixedCellSize()).add(2));
+
         listView.getSelectionModel().selectedItemProperty().addListener(new ChangeListener<String>() {
-                    @Override
-                    public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
-                        try {
-                            App.setRoot("fxml/game");
-                        } catch (IOException ex) {
-                            ex.printStackTrace();
-                        }
-                    }
-                });
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                try {
+                    App.setRoot("fxml/game");
+                } catch (IOException ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 
     @FXML
