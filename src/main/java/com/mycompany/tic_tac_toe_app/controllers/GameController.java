@@ -15,9 +15,11 @@ import javafx.fxml.Initializable;
 
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import javafx.scene.media.MediaView;
 import javafx.util.Pair;
 
 public class GameController implements Initializable {
@@ -43,14 +45,16 @@ public class GameController implements Initializable {
     @FXML
     private VBox resultPane;
     @FXML
-    private ImageView resultGif;
-    @FXML
-    private Label resultLabel;
+    private MediaView stateVideo;
 
+    
     private static GameMode currentMode;
 
     private GameStrategy gameStrategy;
+    
     private Button[][] boardButtons;
+    
+    private MediaPlayer mediaPlayer;
 
     public static void setGameMode(GameMode mode) {
         currentMode = mode;
@@ -66,10 +70,13 @@ public class GameController implements Initializable {
 
         switch (currentMode) {
             case SINGLE_PLAYER:
-                gameStrategy = new ComputerGame(this::updateGuiFromComputerMove);
+                gameStrategy = new ComputerGame(this::updateGuiFromComputerMove, this::showResult);
                 break;
             case LOCAL_MULTIPLAYER:
-                gameStrategy = new LocalGame();
+
+                LocalGame localGame = new LocalGame();
+                localGame.showResultCallback = this::showResult; 
+                gameStrategy = localGame;
                 break;
             default:
                 break;
@@ -82,7 +89,6 @@ public class GameController implements Initializable {
         String id = clickedButton.getId();
 
         gameStrategy.createMove(clickedButton, id);
-        
     }
 
     private void updateGuiFromComputerMove(Pair<Integer, Integer> move) {
@@ -97,7 +103,36 @@ public class GameController implements Initializable {
     }
 
     @FXML
-    private void goBackOnClick(ActionEvent event) throws IOException{
+    private void goBackOnClick(ActionEvent event) throws IOException {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+        }
         App.setRoot("fxml/menu");
+    }
+
+    public void showResult(String videoFile) {
+
+        try {
+
+            Media media = new Media(getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/" + videoFile).toExternalForm());
+            
+            if (mediaPlayer != null) {
+                mediaPlayer.stop(); 
+            }
+            
+            mediaPlayer = new MediaPlayer(media);
+
+            stateVideo.setMediaPlayer(mediaPlayer);
+            
+            mediaPlayer.play();
+
+            stateVideo.setVisible(true);
+
+        } catch (Exception e) {
+            System.out.println("Error loading video: " + e.getMessage());
+            e.printStackTrace();
+        }
+
+        resultPane.setVisible(true);
     }
 }

@@ -30,7 +30,7 @@
 .list-view .list-cell {
     -fx-background-color: transparent;
     -fx-padding: 10 12 10 12;
-    -fx-font-size: 25px;
+    -fx-font-size: 20px;
 }
 
 .list-view .list-cell:hover {

@@ -5,6 +5,7 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.App;
+import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -36,11 +37,15 @@ public class SavedGamesController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
 
-//        if (listView.getItems().isEmpty()) {
-//            listView.getItems().add("No Saved Games To Show");
-//        } else {
-            listView.getItems().addAll("Game 1", "Game 2", "Game 3", "Game 4", "Game 5");
-//        }
+        listView.getItems().clear();
+        
+        if (ClientProtocol.savedGamesList.isEmpty()) {
+            listView.getItems().add("No Saved Games To Show");
+            listView.setDisable(true);
+        } else {
+            listView.setDisable(false);
+            listView.getItems().addAll(ClientProtocol.savedGamesList);
+        }
 
         listView.prefHeightProperty().bind(Bindings.size(listView.getItems()).multiply(listView.getFixedCellSize()).add(2));
 

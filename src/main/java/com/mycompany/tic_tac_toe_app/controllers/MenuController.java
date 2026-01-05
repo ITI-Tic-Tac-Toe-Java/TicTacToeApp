@@ -1,8 +1,8 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
-
 import com.mycompany.tic_tac_toe_app.App;
 import com.mycompany.tic_tac_toe_app.model.service.GameMode;
+import com.mycompany.tic_tac_toe_app.network.Client;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-
 
 public class MenuController implements Initializable {
 
@@ -32,8 +31,11 @@ public class MenuController implements Initializable {
     @FXML
     private Label rankNumber;
 
+    private Client client;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        client = Client.getInstance();
 
     }
 
@@ -51,6 +53,7 @@ public class MenuController implements Initializable {
 
     @FXML
     private void replayGameAction(ActionEvent event) throws IOException {
+        client.sendMessage("GET_GAME_HISTORY");
         App.setRoot("fxml/savedGames");
     }
 

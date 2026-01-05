@@ -9,13 +9,16 @@ import java.net.Socket;
 import javafx.application.Platform;
 
 public class Client extends Thread {
+
     private final int port = 5008;
     private final String localHost = "localhost";
     private PrintStream ps;
     private BufferedReader br;
     private Socket socket;
 
-    public Client() {
+    private static Client INSTANCE;
+
+    private Client() {
         try {
             socket = new Socket(localHost, port);
             this.ps = new PrintStream(socket.getOutputStream());
@@ -23,6 +26,14 @@ public class Client extends Thread {
         } catch (IOException ex) {
             Functions.showErrorAlert(new IOException("Error In Connecting Client"));
         }
+    }
+
+    public synchronized static Client getInstance() {
+        if (INSTANCE == null) {
+            INSTANCE = new Client();
+            INSTANCE.start();
+        }
+        return INSTANCE;
     }
 
     @Override
@@ -34,7 +45,7 @@ public class Client extends Thread {
         String msg;
         try {
             while ((msg = br.readLine()) != null) {
-                ClientProtocol.processMessage(msg);
+                ClientProtocol.processMessage(msg, this);
             }
         } catch (IOException ex) {
             Functions.showErrorAlert(new IOException("Error In Receving Message"));
