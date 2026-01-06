@@ -5,6 +5,7 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.App;
+import com.mycompany.tic_tac_toe_app.network.Client;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -34,17 +35,35 @@ public class RegisterController implements Initializable {
     private Button signUpBtn;
     @FXML
     private Text signIn;
-
+    private Client client;
     /**
      * Initializes the controller class.
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        client = new Client();
+        client.start();
     }
 
     @FXML
-    private void signUp(ActionEvent event) {
+    private void signUp(ActionEvent event) throws IOException{
+       String userNameText = username.getText();
+       String uerPasswordText = password.getText();
+       String confirmPasswordText = confirmPassowrd.getText();
+
+       if (!uerPasswordText.equals(confirmPasswordText)) {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Password Mismatch");
+            alert.setHeaderText(null);
+            alert.setContentText("Passwords do not match!");
+            alert.showAndWait();
+            return;
+             }
+
+            StringBuilder sb = new StringBuilder();
+            sb.append("REGISTER:").append(userNameText).append(":").append(uerPasswordText);
+            client.sendMessage(sb.toString());
+
     }
 
     @FXML
