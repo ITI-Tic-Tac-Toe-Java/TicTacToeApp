@@ -1,5 +1,6 @@
 package com.mycompany.tic_tac_toe_app.network;
 
+import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -10,15 +11,17 @@ import javafx.application.Platform;
 
 public class Client extends Thread {
 
+    private PlayerDTO player;
     private final int port = 5008;
     private final String localHost = "localhost";
     private PrintStream ps;
     private BufferedReader br;
     private Socket socket;
-
+    private ClientProtocol cp;
     private static Client INSTANCE;
 
     private Client() {
+        cp = ClientProtocol.getInstance();
         try {
             socket = new Socket(localHost, port);
             this.ps = new PrintStream(socket.getOutputStream());
@@ -41,11 +44,19 @@ public class Client extends Thread {
         receiveMessage();
     }
 
+    public void setPlayer(PlayerDTO player) {
+        this.player = player;
+    } 
+    
+    public PlayerDTO getPlayer() {
+        return player;
+    }
+
     private void receiveMessage() {
         String msg;
         try {
             while ((msg = br.readLine()) != null) {
-                ClientProtocol.processMessage(msg, this);
+                cp.processMessage(msg, this);
             }
         } catch (IOException ex) {
             Functions.showErrorAlert(new IOException("Error In Receving Message"));
