@@ -1,9 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package com.mycompany.tic_tac_toe_app.controllers;
-
 
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
 import com.mycompany.tic_tac_toe_app.util.Functions;
@@ -16,20 +11,13 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ListView;
 
-/**
- * FXML Controller class
- *
- * @author thaowpstasaiid
- */
+
 public class SavedGamesController implements Initializable {
 
     @FXML
     private ListView<String> listView;
     private List<String> savedGames;
 
-    /**
-     * Initializes the controller class.
-     */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ClientProtocol cp = ClientProtocol.getInstance();
