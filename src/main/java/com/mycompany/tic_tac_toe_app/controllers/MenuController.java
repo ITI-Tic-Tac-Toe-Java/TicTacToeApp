@@ -1,8 +1,10 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.App;
+import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
 import com.mycompany.tic_tac_toe_app.model.service.GameMode;
 import com.mycompany.tic_tac_toe_app.network.Client;
+import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -25,7 +27,7 @@ public class MenuController implements Initializable {
     @FXML
     private Button logoutButton;
     @FXML
-    private Label UserName;
+    private Label userName;
     @FXML
     private Label pointsNumber;
     @FXML
@@ -36,34 +38,39 @@ public class MenuController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         client = Client.getInstance();
-
+        PlayerDTO player = client.getPlayer();
+        
+        userName.setText(player.getUserName());
+        pointsNumber.setText(String.valueOf(player.getScore()));
+        rankNumber.setText("Bronze");
     }
 
     @FXML
-    private void singlePlayerAction(ActionEvent event) throws IOException {
+    private void singlePlayerAction(ActionEvent event){
         GameController.setGameMode(GameMode.SINGLE_PLAYER);
-        App.setRoot("fxml/game");
+        Functions.naviagteTo("fxml/game");
     }
 
     @FXML
-    private void localMultiplayerAction(ActionEvent event) throws IOException {
+    private void localMultiplayerAction(ActionEvent event) {
         GameController.setGameMode(GameMode.LOCAL_MULTIPLAYER);
-        App.setRoot("fxml/game");
+        Functions.naviagteTo("fxml/game");
     }
 
     @FXML
-    private void replayGameAction(ActionEvent event) throws IOException {
+    private void replayGameAction(ActionEvent event) {
         client.sendMessage("GET_GAME_HISTORY");
-        App.setRoot("fxml/savedGames");
+        Functions.naviagteTo("fxml/savedGames");
     }
 
     @FXML
-    private void logoutAction(ActionEvent event) throws IOException {
-        App.setRoot("fxml/login");
+    private void logoutAction(ActionEvent event) {
+        Functions.naviagteTo("fxml/login");
     }
 
     @FXML
-    private void onlineMultiplayerAction(ActionEvent event) throws IOException {
-        App.setRoot("fxml/onlinePlayers");
+    private void onlineMultiplayerAction(ActionEvent event)  {
+        client.sendMessage("GET_ONLINE_PLAYERS");
+        Functions.naviagteTo("fxml/onlinePlayers");
     }
 }
