@@ -5,7 +5,6 @@ import com.mycompany.tic_tac_toe_app.model.PlayerDTO.PlayerStatus;
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
