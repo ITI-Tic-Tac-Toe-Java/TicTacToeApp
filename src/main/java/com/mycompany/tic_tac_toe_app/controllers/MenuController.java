@@ -63,8 +63,7 @@ public class MenuController implements Initializable {
         Functions.naviagteTo("fxml/savedGames");
     }
 
-    @FXML
-    private void logoutAction(ActionEvent event) {
+        private void logoutAction(ActionEvent event) {
         Functions.naviagteTo("fxml/login");
     }
 

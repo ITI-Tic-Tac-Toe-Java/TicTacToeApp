@@ -3,10 +3,12 @@ package com.mycompany.tic_tac_toe_app.network;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO.PlayerStatus;
 import com.mycompany.tic_tac_toe_app.util.Functions;
+import com.mycompany.tic_tac_toe_app.model.service.online_mode.GameListener;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import javafx.application.Platform;
 
 public class ClientProtocol {
 
@@ -19,15 +21,21 @@ public class ClientProtocol {
     private final String INVITE_ACCEPTED = "INVITE_ACCEPTED";
     private final String INVITE_REJECTED = "INVITE_REJECTED";
     private final String PLAYER_LIST = "PLAYER_LIST";
+    private final static String GAME_START = "GAME_START";
+    private final static String MOVE_VALID = "MOVE_VALID";
+    private final static String GAME_OVER = "GAME_OVER";
 
     private final List<String> savedGamesList = new ArrayList<>();
     private final Set<PlayerDTO> players = new HashSet<>();
+    private static GameListener gameListener;
 
     private static ClientProtocol INSTANCE;
 
-    private ClientProtocol() {
-
+    public static void setGameListener(GameListener listener) {
+        gameListener = listener;
     }
+
+    private ClientProtocol() {}
 
     public synchronized static ClientProtocol getInstance() {
         if (INSTANCE == null) {
@@ -48,6 +56,25 @@ public class ClientProtocol {
         switch (messageType) {
             case LOGIN_SUCCESS:
                 onLoginSuccess(parts, client);
+                break;
+                
+            case GAME_START:
+                Platform.runLater(() -> Functions.naviagteTo("fxml/game"));
+                break;
+
+            case MOVE_VALID:
+                if (gameListener != null && parts.length >= 4) {
+                    int r = Integer.parseInt(parts[1]);
+                    int c = Integer.parseInt(parts[2]);
+                    String sym = parts[3];
+                    Platform.runLater(() -> gameListener.onOpponentMove(r, c, sym));
+                }
+                break;
+
+            case GAME_OVER:
+                if (gameListener != null && parts.length >= 2) {
+                    Platform.runLater(() -> gameListener.onGameResult(parts[1]));
+                }
                 break;
 
             case REGISTER_SUCCESS:

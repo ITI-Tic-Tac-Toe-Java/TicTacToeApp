@@ -5,6 +5,7 @@ import com.mycompany.tic_tac_toe_app.model.service.GameMode;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.model.service.computer.ComputerGame;
 import com.mycompany.tic_tac_toe_app.model.service.local_multiplay.LocalGame;
+import com.mycompany.tic_tac_toe_app.model.service.online_mode.OnlineGame;
 import java.io.IOException;
 
 import java.net.URL;
@@ -76,6 +77,15 @@ public class GameController implements Initializable {
                 localGame.showResultCallback = this::showResult; 
                 gameStrategy = localGame;
                 break;
+                
+            case ONLINE_MULTIPLAYER:
+                gameStrategy = new OnlineGame(
+                    this::updateGuiFromComputerMove,
+                    this::showResult,
+                    boardButtons
+                );
+                break;
+                
             default:
                 break;
         }
