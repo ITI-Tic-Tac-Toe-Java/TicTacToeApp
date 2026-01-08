@@ -7,31 +7,20 @@ package com.mycompany.tic_tac_toe_app.model.service.online_mode;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
-import com.mycompany.tic_tac_toe_app.util.Functions;
-import java.util.function.Consumer;
-import javafx.application.Platform;
 import javafx.scene.control.Button;
-import javafx.util.Pair;
 
 /**
  *
  * @author thaowpstasaiid
  */
-public class OnlineGame implements GameStrategy, GameListener {
+public class OnlineGame implements GameStrategy{
 
-    private final Consumer<Pair<Integer, Integer>> updateGuiCallback;
-    private final Consumer<String> showResultCallback;
-    private final Button[][] boardButtons;
-    private Client client;
+    private final Client client;
 
-    public OnlineGame(Consumer<Pair<Integer, Integer>> updateGuiCallback,
-            Consumer<String> showResultCallback,
-            Button[][] boardButtons) {
-        this.updateGuiCallback = updateGuiCallback;
-        this.showResultCallback = showResultCallback;
-        this.boardButtons = boardButtons;
-
-        ClientProtocol.setGameListener(this);
+    public OnlineGame(GameListener gameListener) {
+        client = Client.getInstance();
+        
+        ClientProtocol.setGameListener(gameListener);
     }
 
     @Override
@@ -47,46 +36,4 @@ public class OnlineGame implements GameStrategy, GameListener {
         return false;
     }
 
-    @Override
-    public void onOpponentMove(int row, int col, String symbol) {
-        Button btn = boardButtons[row][col];
-
-        if (btn != null) {
-            btn.setText(symbol);
-            btn.setDisable(true);
-        }
-    }
-
-    @Override
-    public void onGameResult(String result) {
-        String videoFile = "";
-
-        if ("OPPONENT_LEFT".equals(result)) {
-            Platform.runLater(() -> {
-                Functions.showErrorAlert(new Exception("Your opponent has disconnected!, The game Ended"));
-                Functions.naviagteTo("fxml/menu");
-            });
-
-            ClientProtocol.setGameListener(null);
-            return;
-        }
-
-        switch (result) {
-            case "WIN":
-                videoFile = "win.mp4";
-                break;
-            case "LOSE":
-                videoFile = "lose.mp4";
-                break;
-            case "DRAW":
-                videoFile = "draw.mp4";
-                break;
-        }
-
-        if (!videoFile.isEmpty()) {
-            showResultCallback.accept(videoFile);
-        }
-
-        ClientProtocol.setGameListener(null);
-    }
 }
