@@ -9,15 +9,15 @@ import java.io.IOException;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 public class GameController implements Initializable {
@@ -82,22 +82,25 @@ public class GameController implements Initializable {
         String id = clickedButton.getId();
 
         gameStrategy.createMove(clickedButton, id);
-        
+
     }
 
     private void updateGuiFromComputerMove(Pair<Integer, Integer> move) {
         int r = move.getKey();
         int c = move.getValue();
-
-        Button btn = boardButtons[r][c];
-        if (btn != null) {
-            btn.setText("O");
-            btn.setDisable(true);
-        }
+        PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
+        delay.setOnFinished(event -> {
+            Button btn = boardButtons[r][c];
+            if (btn != null) {
+                btn.setText("O");
+                btn.setDisable(true);
+            }
+        });
+        delay.play();
     }
 
     @FXML
-    private void goBackOnClick(ActionEvent event) throws IOException{
+    private void goBackOnClick(ActionEvent event) throws IOException {
         App.setRoot("fxml/menu");
     }
 }

@@ -4,7 +4,9 @@ import com.mycompany.tic_tac_toe_app.controllers.GameController;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.model.service.XOGameLogic;
 import java.util.function.Consumer;
+import javafx.animation.PauseTransition;
 import javafx.scene.control.Button;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 public class ComputerGame implements GameStrategy {
@@ -34,6 +36,7 @@ public class ComputerGame implements GameStrategy {
     }
 
     void makeRandomMove() {
+
         String curMove = game.getEmptyPos();
         if (!curMove.equals("")) {
             String[] rc = curMove.split(",");
@@ -51,8 +54,8 @@ public class ComputerGame implements GameStrategy {
 //            }
             checkGameStatus(2);
         }
+
     }
-    
 
     @Override
     public boolean checkGameStatus(int player) {

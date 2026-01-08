@@ -1,7 +1,4 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
+
 package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.App;
@@ -22,7 +19,6 @@ public class InvetationController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
     }    
     
     @FXML
