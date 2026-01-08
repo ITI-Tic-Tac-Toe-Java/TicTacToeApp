@@ -39,14 +39,14 @@ public class MenuController implements Initializable {
     public void initialize(URL url, ResourceBundle rb) {
         client = Client.getInstance();
         PlayerDTO player = client.getPlayer();
-        
+
         userName.setText(player.getUserName());
         pointsNumber.setText(String.valueOf(player.getScore()));
         rankNumber.setText("Bronze");
     }
 
     @FXML
-    private void singlePlayerAction(ActionEvent event){
+    private void singlePlayerAction(ActionEvent event) {
         GameController.setGameMode(GameMode.SINGLE_PLAYER);
         Functions.naviagteTo("fxml/game");
     }
@@ -63,12 +63,13 @@ public class MenuController implements Initializable {
         Functions.naviagteTo("fxml/savedGames");
     }
 
-        private void logoutAction(ActionEvent event) {
+    @FXML
+    private void logoutAction(ActionEvent event) {
         Functions.naviagteTo("fxml/login");
     }
 
     @FXML
-    private void onlineMultiplayerAction(ActionEvent event)  {
+    private void onlineMultiplayerAction(ActionEvent event) {
         client.sendMessage("GET_ONLINE_PLAYERS");
         Functions.naviagteTo("fxml/onlinePlayers");
     }
