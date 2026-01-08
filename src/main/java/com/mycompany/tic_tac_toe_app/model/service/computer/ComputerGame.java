@@ -3,6 +3,7 @@ package com.mycompany.tic_tac_toe_app.model.service.computer;
 import com.mycompany.tic_tac_toe_app.controllers.GameController;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.model.service.XOGameLogic;
+import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 import javafx.animation.PauseTransition;
 import javafx.scene.control.Button;
@@ -13,10 +14,12 @@ public class ComputerGame implements GameStrategy {
 
     XOGameLogic game = new XOGameLogic();
     //    GameController controller;
+    Consumer<String> showResultCallback;
     Consumer<Pair<Integer, Integer>> handleButton;
 
-    public ComputerGame(Consumer<Pair<Integer, Integer>> handleButton) {
+    public ComputerGame(Consumer<Pair<Integer, Integer>> handleButton, Consumer<String> showResultCallback) {
         this.handleButton = handleButton;
+        this.showResultCallback = showResultCallback;
         // this.controller = controller;
     }
 
@@ -60,11 +63,15 @@ public class ComputerGame implements GameStrategy {
     @Override
     public boolean checkGameStatus(int player) {
         if (game.checkWin(player)) {
-            showAlert("Win", (player == 1 ? "Player X" : "Player O") + " is the winner");
+            showResultCallback.accept(
+//                    player == 1 ? "You Win 🎉" : "You Lose 😢",
+                    player == 1 ? "win.mp4" : "lose.mp4"
+            );
             return true;
         }
+
         if (game.isDraw()) {
-            showAlert("Draw", "There is no winner");
+            showResultCallback.accept("draw.mp4");
             return true;
         }
         return false;

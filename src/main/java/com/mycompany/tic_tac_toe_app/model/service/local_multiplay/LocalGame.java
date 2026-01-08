@@ -2,6 +2,9 @@ package com.mycompany.tic_tac_toe_app.model.service.local_multiplay;
 
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.model.service.XOGameLogic;
+import com.mycompany.tic_tac_toe_app.network.Client;
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 
@@ -9,7 +12,9 @@ public class LocalGame implements GameStrategy{
 
     boolean isX = true;
     XOGameLogic game = new XOGameLogic();
-
+    public Consumer<String> showResultCallback;
+    private Client client;
+    
     public void createMove(Button btn, String id) {
         int r = id.charAt(1) - '0';
         int c = id.charAt(2) - '0';
@@ -30,11 +35,11 @@ public class LocalGame implements GameStrategy{
 
     public boolean checkGameStatus(int player) {
         if (game.checkWin(player)) {
-            showAlert("Win", (player == 1 ? "Player X" : "Player O") + " is the winner");
+            showResultCallback.accept( "win.mp4");
             return true;
         }
         if (game.isDraw()) {
-            showAlert("Draw", "There is no winner");
+            showResultCallback.accept("draw.mp4");
             return true;
         }
         return false;

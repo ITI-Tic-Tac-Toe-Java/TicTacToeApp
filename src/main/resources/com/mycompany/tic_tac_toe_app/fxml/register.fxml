@@ -82,7 +82,7 @@
                                         <Insets right="5.0" />
                                     </HBox.margin>
                                 </Text>
-                                <Text fx:id="signIn" fill="#225577" onMouseClicked="#NavigateToSignIn" strokeType="OUTSIDE" strokeWidth="0.0" text="Sign In">
+                                <Text fx:id="signIn" fill="#225577" onMouseClicked="#navigateToSignIn" strokeType="OUTSIDE" strokeWidth="0.0" text="Sign In">
                                     <font>
                                         <Font size="12.0" />
                                     </font>

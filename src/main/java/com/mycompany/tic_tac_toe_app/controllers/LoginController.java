@@ -1,10 +1,7 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/javafx/FXMLController.java to edit this template
- */
 package com.mycompany.tic_tac_toe_app.controllers;
 
-import com.mycompany.tic_tac_toe_app.App;
+import com.mycompany.tic_tac_toe_app.network.Client;
+import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
@@ -17,45 +14,49 @@ import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.text.Text;
 
-/**
- * FXML Controller class
- *
- * @author thaowpstasaiid
- */
 public class LoginController implements Initializable {
 
     @FXML
-    private TextField username;
+    private TextField userNameTxtField;
     @FXML
-    private TextField password;
+    private TextField passwordTxtField;
     @FXML
     private Button signInBtn;
     @FXML
     private Text registerLink;
 
-    /**
-     * Initializes the controller class.
-     */
+    private Client client;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // TODO
+        client = Client.getInstance();
     }
 
     @FXML
     private void signIn(ActionEvent event) throws IOException {
-        App.setRoot("fxml/menu");
+        String userName = userNameTxtField.getText();
+        String password = passwordTxtField.getText();
+        
+        if (userName.trim().isEmpty()) {
+            Functions.showErrorAlert(new Exception("Username Field is Requried"));
+            return;
+        }
+        
+        if (password.trim().isEmpty()) {
+            Functions.showErrorAlert(new Exception("Password Field is Requried"));
+            return;
+        }
+        
+        StringBuilder sb = new StringBuilder();
+        sb.append("LOGIN:").append(userName).append(":").append(password);
+
+        String loginMessage = sb.toString();
+
+        client.sendMessage(loginMessage);
     }
 
     @FXML
-    private void NavigateToRegister(MouseEvent event) {
-        try {
-            App.setRoot("fxml/register");
-        } catch (IOException ex) {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Error in Loading Screen");
-            alert.setHeaderText(null);
-            alert.setContentText(ex.getLocalizedMessage());
-            alert.showAndWait();
-        }
+    private void navigateToRegister(MouseEvent event) throws IOException {
+        Functions.naviagteTo("fxml/register");
     }
 }
