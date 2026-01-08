@@ -2,19 +2,27 @@ package com.mycompany.tic_tac_toe_app.network;
 
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import com.mycompany.tic_tac_toe_app.App;
+import com.mycompany.tic_tac_toe_app.model.service.online_mode.GameListener;
 import java.util.ArrayList;
 import java.util.List;
+import javafx.application.Platform;
 
 public class ClientProtocol {
 
     private final static String LOGIN_SUCCESS = "LOGIN_SUCCESS";
     private final static String LOGIN_FAILED = "LOGIN_FAILED";
-
-    // FIX 1: Remove the colon from here to make logic cleaner
     private final static String HISTORY_RESPONSE = "HISTORY_RESPONSE";
+    private final static String GAME_START = "GAME_START";
+    private final static String MOVE_VALID = "MOVE_VALID";
+    private final static String GAME_OVER = "GAME_OVER";
 
     public static List<String> savedGamesList = new ArrayList<>();
-
+    private static GameListener gameListener;
+    
+    public static void setGameListener(GameListener listener) {
+        gameListener = listener;
+    }
+    
     public static void reset() {
         savedGamesList.clear();
     }
@@ -36,13 +44,35 @@ public class ClientProtocol {
             case LOGIN_SUCCESS:
                 onLoginSuccess();
                 break;
+                
             case LOGIN_FAILED:
                 onLoginFailed();
                 break;
+                
+            case GAME_START:
+                Platform.runLater(() -> Functions.naviagteTo("fxml/game"));
+                break;
+
+            case MOVE_VALID:
+                if (gameListener != null && parts.length >= 4) {
+                    int r = Integer.parseInt(parts[1]);
+                    int c = Integer.parseInt(parts[2]);
+                    String sym = parts[3];
+                    Platform.runLater(() -> gameListener.onOpponentMove(r, c, sym));
+                }
+                break;
+
+            case GAME_OVER:
+                if (gameListener != null && parts.length >= 2) {
+                    Platform.runLater(() -> gameListener.onGameResult(parts[1]));
+                }
+                break;
+                
             case "ERROR":
                 System.out.println("SERVER ERROR: " + parts[1]);
                 Functions.showErrorAlert(new Exception(parts[1]));
                 break;
+                
             default:
                 break;
         }

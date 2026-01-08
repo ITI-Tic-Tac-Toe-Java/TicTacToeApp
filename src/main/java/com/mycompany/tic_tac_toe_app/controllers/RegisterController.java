@@ -41,8 +41,7 @@ public class RegisterController implements Initializable {
      */
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        client = new Client();
-        client.start();
+        client = Client.getInstance();
     }
 
     @FXML

@@ -59,11 +59,13 @@ public class MenuController implements Initializable {
 
     @FXML
     private void logoutAction(ActionEvent event) throws IOException {
+        client.sendMessage("LOGOUT");
         App.setRoot("fxml/login");
     }
 
     @FXML
     private void onlineMultiplayerAction(ActionEvent event) throws IOException {
+        GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
         App.setRoot("fxml/onlinePlayers");
     }
 }

@@ -5,6 +5,7 @@ import com.mycompany.tic_tac_toe_app.model.service.GameMode;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.model.service.computer.ComputerGame;
 import com.mycompany.tic_tac_toe_app.model.service.local_multiplay.LocalGame;
+import com.mycompany.tic_tac_toe_app.model.service.online_mode.OnlineGame;
 import java.io.IOException;
 
 import java.net.URL;
@@ -14,8 +15,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -78,6 +77,15 @@ public class GameController implements Initializable {
                 localGame.showResultCallback = this::showResult; 
                 gameStrategy = localGame;
                 break;
+                
+            case ONLINE_MULTIPLAYER:
+                gameStrategy = new OnlineGame(
+                    this::updateGuiFromComputerMove,
+                    this::showResult,
+                    boardButtons
+                );
+                break;
+                
             default:
                 break;
         }
