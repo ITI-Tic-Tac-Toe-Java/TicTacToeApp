@@ -3,9 +3,7 @@ package com.mycompany.tic_tac_toe_app.model.service.local_multiplay;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.model.service.XOGameLogic;
 import com.mycompany.tic_tac_toe_app.network.Client;
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 
 public class LocalGame implements GameStrategy{
@@ -29,13 +27,14 @@ public class LocalGame implements GameStrategy{
 
         btn.setDisable(true);
         checkGameStatus(1);
+        checkGameStatus(2);
 
         isX = !isX;
     }
 
     public boolean checkGameStatus(int player) {
         if (game.checkWin(player)) {
-            showResultCallback.accept( "win.mp4");
+            showResultCallback.accept("win.mp4");
             return true;
         }
         if (game.isDraw()) {
