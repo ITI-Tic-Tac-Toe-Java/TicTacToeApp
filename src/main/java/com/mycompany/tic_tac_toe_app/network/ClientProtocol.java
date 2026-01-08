@@ -171,7 +171,6 @@ public class ClientProtocol {
                 () -> {
                     String message = new StringBuilder("INVITE_RESPONSE:").append(senderUserName).append(":").append("ACCEPTED").toString();
                     client.sendMessage(message);
-                    Functions.naviagteTo("fxml/game");
                     return true;
                 },
                 () -> {

@@ -70,6 +70,7 @@ public class MenuController implements Initializable {
 
     @FXML
     private void onlineMultiplayerAction(ActionEvent event) {
+        GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
         client.sendMessage("GET_ONLINE_PLAYERS");
         Functions.naviagteTo("fxml/onlinePlayers");
     }

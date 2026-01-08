@@ -5,11 +5,15 @@ import com.mycompany.tic_tac_toe_app.model.service.GameMode;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
 import com.mycompany.tic_tac_toe_app.model.service.computer.ComputerGame;
 import com.mycompany.tic_tac_toe_app.model.service.local_multiplay.LocalGame;
+import com.mycompany.tic_tac_toe_app.model.service.online_mode.GameListener;
 import com.mycompany.tic_tac_toe_app.model.service.online_mode.OnlineGame;
+import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
+import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.io.IOException;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -46,13 +50,12 @@ public class GameController implements Initializable {
     @FXML
     private MediaView stateVideo;
 
-    
     private static GameMode currentMode;
 
     private GameStrategy gameStrategy;
-    
+
     private Button[][] boardButtons;
-    
+
     private MediaPlayer mediaPlayer;
 
     public static void setGameMode(GameMode mode) {
@@ -74,18 +77,62 @@ public class GameController implements Initializable {
             case LOCAL_MULTIPLAYER:
 
                 LocalGame localGame = new LocalGame();
-                localGame.showResultCallback = this::showResult; 
+                localGame.showResultCallback = this::showResult;
                 gameStrategy = localGame;
                 break;
-                
+
             case ONLINE_MULTIPLAYER:
-                gameStrategy = new OnlineGame(
-                    this::updateGuiFromComputerMove,
-                    this::showResult,
-                    boardButtons
-                );
+
+                GameListener gameListener = new GameListener() {
+                    @Override
+                    public void onOpponentMove(int row, int col, String symbol) {
+                        Platform.runLater(() -> {
+                            Button btn = boardButtons[row][col];
+
+                            if (btn != null) {
+                                btn.setText(symbol);
+                                btn.setDisable(true);
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onGameResult(String result) {
+                        String videoFile = "";
+
+                        if ("OPPONENT_LEFT".equals(result)) {
+                            Platform.runLater(() -> {
+                                Functions.showErrorAlert(new Exception("Your opponent has disconnected!, The game Ended"));
+                                Functions.naviagteTo("fxml/menu");
+                            });
+
+                            ClientProtocol.setGameListener(null);
+                            return;
+                        }
+
+                        switch (result) {
+                            case "WIN":
+                                videoFile = "win.mp4";
+                                break;
+                            case "LOSE":
+                                videoFile = "lose.mp4";
+                                break;
+                            case "DRAW":
+                                videoFile = "draw.mp4";
+                                break;
+                        }
+
+                        if (!videoFile.isEmpty()) {
+                            showResult(videoFile);
+                        }
+
+                        ClientProtocol.setGameListener(null);
+                    }
+
+                };
+                gameStrategy = new OnlineGame(gameListener);
                 break;
-                
+
             default:
                 break;
         }
@@ -110,6 +157,16 @@ public class GameController implements Initializable {
         }
     }
 
+    public void onOpponentMove(int row, int col, String symbol) {
+        Platform.runLater(() -> {
+            Button btn = boardButtons[row][col];
+            if (btn != null) {
+                btn.setText(symbol);
+                btn.setDisable(true);
+            }
+        });
+    }
+
     @FXML
     private void goBackOnClick(ActionEvent event) throws IOException {
         if (mediaPlayer != null) {
@@ -123,15 +180,15 @@ public class GameController implements Initializable {
         try {
 
             Media media = new Media(getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/" + videoFile).toExternalForm());
-            
+
             if (mediaPlayer != null) {
-                mediaPlayer.stop(); 
+                mediaPlayer.stop();
             }
-            
+
             mediaPlayer = new MediaPlayer(media);
 
             stateVideo.setMediaPlayer(mediaPlayer);
-            
+
             mediaPlayer.play();
 
             stateVideo.setVisible(true);
