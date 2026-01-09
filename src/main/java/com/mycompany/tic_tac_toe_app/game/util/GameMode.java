@@ -1,4 +1,4 @@
-package com.mycompany.tic_tac_toe_app.model.service;
+package com.mycompany.tic_tac_toe_app.game.util;
 
 public enum GameMode {
     SINGLE_PLAYER,

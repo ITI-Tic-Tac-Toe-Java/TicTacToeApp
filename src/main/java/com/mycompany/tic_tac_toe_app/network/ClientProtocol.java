@@ -1,9 +1,12 @@
 package com.mycompany.tic_tac_toe_app.network;
 
+import com.mycompany.tic_tac_toe_app.controllers.GameController;
+import com.mycompany.tic_tac_toe_app.game.online_mode.OnlineGame;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO.PlayerStatus;
 import com.mycompany.tic_tac_toe_app.util.Functions;
-import com.mycompany.tic_tac_toe_app.model.service.online_mode.GameListener;
+import com.mycompany.tic_tac_toe_app.game.util.GameListener;
+import com.mycompany.tic_tac_toe_app.game.util.GameMode;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -21,21 +24,22 @@ public class ClientProtocol {
     private final String INVITE_ACCEPTED = "INVITE_ACCEPTED";
     private final String INVITE_REJECTED = "INVITE_REJECTED";
     private final String PLAYER_LIST = "PLAYER_LIST";
-    private final static String GAME_START = "GAME_START";
-    private final static String MOVE_VALID = "MOVE_VALID";
-    private final static String GAME_OVER = "GAME_OVER";
+    private final String GAME_START = "GAME_START";
+    private final String MOVE_VALID = "MOVE_VALID";
+    private final String GAME_OVER = "GAME_OVER";
 
     private final List<String> savedGamesList = new ArrayList<>();
     private final Set<PlayerDTO> players = new HashSet<>();
-    private static GameListener gameListener;
+    private static OnlineGame onlineGame;
 
     private static ClientProtocol INSTANCE;
 
-    public static void setGameListener(GameListener listener) {
-        gameListener = listener;
+    public void setOnlineGame(OnlineGame onlineGame) {
+        this.onlineGame = onlineGame;
     }
 
-    private ClientProtocol() {}
+    private ClientProtocol() {
+    }
 
     public synchronized static ClientProtocol getInstance() {
         if (INSTANCE == null) {
@@ -57,23 +61,24 @@ public class ClientProtocol {
             case LOGIN_SUCCESS:
                 onLoginSuccess(parts, client);
                 break;
-                
+
             case GAME_START:
+                GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
                 Platform.runLater(() -> Functions.naviagteTo("fxml/game"));
                 break;
 
             case MOVE_VALID:
-                if (gameListener != null && parts.length >= 4) {
+                if (onlineGame.getGameListener() != null && parts.length >= 4) {
                     int r = Integer.parseInt(parts[1]);
                     int c = Integer.parseInt(parts[2]);
                     String sym = parts[3];
-                    Platform.runLater(() -> gameListener.onOpponentMove(r, c, sym));
+                    Platform.runLater(() -> onlineGame.getGameListener().onPlayerMove(r, c, sym,onlineGame.getOnMoveListener()));
                 }
                 break;
 
             case GAME_OVER:
-                if (gameListener != null && parts.length >= 2) {
-                    Platform.runLater(() -> gameListener.onGameResult(parts[1]));
+                if (onlineGame.getGameListener() != null && parts.length >= 2) {
+                    Platform.runLater(() -> onlineGame.getGameListener().onGameOver(parts[1], onlineGame.getOnResultListener()));
                 }
                 break;
 
