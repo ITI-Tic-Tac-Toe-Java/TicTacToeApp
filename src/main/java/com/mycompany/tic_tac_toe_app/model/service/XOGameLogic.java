@@ -1,6 +1,9 @@
 package com.mycompany.tic_tac_toe_app.model.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import javafx.util.Pair;
 
 public class XOGameLogic {
 
@@ -70,4 +73,24 @@ public class XOGameLogic {
 //        }
         return "";
     }
+
+
+public List<Pair<Integer,Integer>> getAvailableMoves() {
+    List<Pair<Integer,Integer>> moves = new ArrayList<>();
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[i][j] == EMPTY) {
+                moves.add(new Pair<>(i, j));
+            }
+        }
+    }
+    return moves;
+}
+public void undoMove(int r, int c) {
+    if (board[r][c] != EMPTY) {
+        board[r][c] = EMPTY;
+        stepCount--;
+    }
+}
+
 }

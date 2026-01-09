@@ -48,7 +48,8 @@ public class MenuController implements Initializable {
     @FXML
     private void singlePlayerAction(ActionEvent event) {
         GameController.setGameMode(GameMode.SINGLE_PLAYER);
-        Functions.naviagteTo("fxml/game");
+        //Functions.naviagteTo("fxml/game");
+        Functions.naviagteTo("fxml/singlePlayerLevel");
     }
 
     @FXML

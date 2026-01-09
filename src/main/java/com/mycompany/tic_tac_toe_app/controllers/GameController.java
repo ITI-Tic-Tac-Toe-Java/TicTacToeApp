@@ -61,11 +61,18 @@ public class GameController implements Initializable {
     private Button[][] boardButtons;
     
     private MediaPlayer mediaPlayer;
+    
+    private static int aiDepth = 3;
 
     public static void setGameMode(GameMode mode) {
         currentMode = mode;
     }
 
+    public static void setAiDepth(int depth) {
+    aiDepth = depth;
+   }
+    
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         boardButtons = new Button[][]{{_00, _01, _02}, {_10, _11, _12}, {_20, _21, _22}};
@@ -76,7 +83,7 @@ public class GameController implements Initializable {
 
         switch (currentMode) {
             case SINGLE_PLAYER:
-                gameStrategy = new ComputerGame(this::updateGuiFromComputerMove, this::showResult);
+                gameStrategy = new ComputerGame(aiDepth,this::updateGuiFromComputerMove, this::showResult);
                 break;
             case LOCAL_MULTIPLAYER:
 
