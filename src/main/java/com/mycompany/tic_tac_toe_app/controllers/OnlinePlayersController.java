@@ -111,7 +111,7 @@ public class OnlinePlayersController implements Initializable {
         if (!(name.equals(Client.getInstance().getPlayer().getUserName()))) {
             row.getChildren().add(inviteBtn);
         }
-        
+
         playersListView.getItems().add(row);
     }
 

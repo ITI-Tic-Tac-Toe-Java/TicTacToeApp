@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 import javafx.application.Platform;
 
 public class ClientProtocol {
@@ -32,6 +33,8 @@ public class ClientProtocol {
     private final Set<PlayerDTO> players = new HashSet<>();
     private static OnlineGame onlineGame;
 
+    private Consumer<String> onInviteRejected;
+    
     private static ClientProtocol INSTANCE;
 
     public void setOnlineGame(OnlineGame onlineGame) {
@@ -189,8 +192,16 @@ public class ClientProtocol {
         Functions.naviagteTo("fxml/game");
     }
 
+    public void setOnInviteRejected(Consumer<String> callback) {
+        this.onInviteRejected = callback;
+    }
+    
     private void onInviteRejected(final String username) {
         Functions.showInformationAlert("Invitation Rejected", username + " Rejected your invitation");
+        
+        if (onInviteRejected != null) {
+            onInviteRejected.accept(username);
+        }
     }
 
     private void onPlayerList(String[] parts) {
@@ -204,6 +215,12 @@ public class ClientProtocol {
             final String username = player[0];
             final int score = Integer.parseInt(player[1]);
 
+            if (Client.getInstance().getPlayer() != null && 
+                Client.getInstance().getPlayer().getUserName().equals(username)) {
+                
+                Client.getInstance().getPlayer().setScore(score);
+            }
+            
             PlayerDTO playerDTO = new PlayerDTO(username, score, PlayerStatus.IDLE);
 
             players.add(playerDTO);

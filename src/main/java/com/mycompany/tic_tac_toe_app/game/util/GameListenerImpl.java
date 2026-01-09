@@ -32,7 +32,7 @@ public class GameListenerImpl implements GameListener{
                     videoFile = "win.mp4";
                     break;
                 case "LOSE":
-                    videoFile = "win.mp4";
+                    videoFile = "lose.mp4";
                     break;
                 case "DRAW":
                     videoFile = "draw.mp4";

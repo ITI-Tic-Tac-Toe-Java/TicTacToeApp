@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 
 public class MenuController implements Initializable {
 
@@ -42,7 +43,21 @@ public class MenuController implements Initializable {
 
         userName.setText(player.getUserName());
         pointsNumber.setText(String.valueOf(player.getScore()));
-        rankNumber.setText("Bronze");
+        
+        updateRankDisplay(player.getScore());
+    }
+    
+    private void updateRankDisplay(int score) {        
+        if (score >= 100) {
+            rankNumber.setText("Gold");
+            rankNumber.setTextFill(Color.web("#FFD700"));
+        } else if (score >= 50) {
+            rankNumber.setText("Silver");
+            rankNumber.setTextFill(Color.web("#C0C0C0"));
+        } else {
+            rankNumber.setText("Bronze");
+            rankNumber.setTextFill(Color.web("#CD7F32")); 
+        }
     }
 
     @FXML
