@@ -57,6 +57,8 @@ public class GameController implements Initializable {
 
     private GameListener gameListener;
 
+    private static int aiDepth = 3;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         boardButtons = new Button[][]{{_00, _01, _02}, {_10, _11, _12}, {_20, _21, _22}};
@@ -72,7 +74,8 @@ public class GameController implements Initializable {
                 gameStrategy = new ComputerGame(
                         gameListener,
                         this::onMove,
-                        this::showResult
+                        this::showResult,
+                        aiDepth
                 );
 
                 break;
@@ -100,6 +103,10 @@ public class GameController implements Initializable {
 
     public static void setGameMode(GameMode gameMode) {
         currentMode = gameMode;
+    }
+
+    public static void setAiDepth(int depth) {
+        aiDepth = depth;
     }
 
     @FXML
@@ -134,10 +141,9 @@ public class GameController implements Initializable {
 
             if (mediaPlayer != null) {
                 mediaPlayer.stop();
-                mediaPlayer.dispose(); 
+                mediaPlayer.dispose();
                 mediaPlayer = null;
             }
-
 
             Media media = new Media(videoUrl.toExternalForm());
             mediaPlayer = new MediaPlayer(media);
@@ -154,24 +160,21 @@ public class GameController implements Initializable {
             mediaPlayer.setOnReady(() -> {
                 Platform.runLater(() -> {
                     stateVideo.setVisible(true);
-                    mediaPlayer.play(); 
+                    mediaPlayer.play();
                     System.out.println("Playing video: " + videoFile);
                 });
             });
 
-           
             mediaPlayer.setOnError(() -> {
                 System.out.println("Error with MediaPlayer: " + mediaPlayer.getError().getMessage());
                 mediaPlayer.getError().printStackTrace();  // More detailed error
             });
 
-            
             mediaPlayer.setOnEndOfMedia(() -> {
                 mediaPlayer.stop();
                 mediaPlayer.dispose();
                 mediaPlayer = null;
 
-                
                 Platform.runLater(() -> {
                     for (Button[] row : boardButtons) {
                         for (Button btn : row) {
@@ -182,7 +185,7 @@ public class GameController implements Initializable {
             });
 
             mediaPlayer.getMedia().getSource();
-            
+
             resultPane.setVisible(true);
         } catch (Exception e) {
             System.out.println("Error loading video: " + e.getMessage());

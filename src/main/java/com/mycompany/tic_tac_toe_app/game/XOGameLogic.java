@@ -3,11 +3,15 @@ package com.mycompany.tic_tac_toe_app.game;
 import static com.mycompany.tic_tac_toe_app.game.XOGameLogic.Symbol.EMPTY;
 import static com.mycompany.tic_tac_toe_app.game.XOGameLogic.Symbol.X;
 import static com.mycompany.tic_tac_toe_app.game.XOGameLogic.Symbol.O;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
+import javafx.util.Pair;
 
 public class XOGameLogic {
 
     public final static class Symbol {
+
         public static final int EMPTY = 0;
         public static final int X = 1;
         public static final int O = 2;
@@ -51,7 +55,7 @@ public class XOGameLogic {
         stepCount = 0;
     }
 
-    public int[] getEmptyPos() {
+    public int[] getRandomEmptyPosition() {
         while (!isDraw()) {
             Random r = new Random();
             int random = r.nextInt(9);
@@ -63,6 +67,25 @@ public class XOGameLogic {
             }
         }
 
-        return new int[]{-1,-1};
+        return new int[]{-1, -1};
+    }
+
+    public List<Pair<Integer, Integer>> getAvailableMoves() {
+        List<Pair<Integer, Integer>> moves = new ArrayList<>();
+        for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++) {
+                if (board[i][j] == EMPTY) {
+                    moves.add(new Pair<>(i, j));
+                }
+            }
+        }
+        return moves;
+    }
+
+    public void undoMove(int r, int c) {
+        if (board[r][c] != EMPTY) {
+            board[r][c] = EMPTY;
+            stepCount--;
+        }
     }
 }
