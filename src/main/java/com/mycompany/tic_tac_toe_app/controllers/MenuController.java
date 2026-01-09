@@ -2,7 +2,7 @@ package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.App;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
-import com.mycompany.tic_tac_toe_app.model.service.GameMode;
+import com.mycompany.tic_tac_toe_app.game.util.GameMode;
 import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.io.IOException;
@@ -70,7 +70,6 @@ public class MenuController implements Initializable {
 
     @FXML
     private void onlineMultiplayerAction(ActionEvent event) {
-        GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
         client.sendMessage("GET_ONLINE_PLAYERS");
         Functions.naviagteTo("fxml/onlinePlayers");
     }
