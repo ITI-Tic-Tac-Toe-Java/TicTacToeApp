@@ -20,6 +20,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -30,7 +31,10 @@ import javafx.util.Pair;
 public class GameController implements Initializable {
 
     @FXML
+    private Label playerName;
+    @FXML
     private Button _00, _01, _02, _10, _11, _12, _20, _21, _22;
+
     private Button[][] boardButtons;
     private GameStrategy gameStrategy;
     private GameListener gameListener;
@@ -39,7 +43,6 @@ public class GameController implements Initializable {
     private static int aiDepth = 3;
     private String lastGameSteps = "";
 
-    
     private boolean isReplayMode = false;
     private static String replayFilePath = null;
 
