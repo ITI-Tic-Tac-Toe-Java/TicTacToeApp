@@ -5,8 +5,8 @@ import com.mycompany.tic_tac_toe_app.game.online_mode.OnlineGame;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO.PlayerStatus;
 import com.mycompany.tic_tac_toe_app.util.Functions;
-import com.mycompany.tic_tac_toe_app.game.util.GameListener;
 import com.mycompany.tic_tac_toe_app.game.util.GameMode;
+import com.mycompany.tic_tac_toe_app.util.Router;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -28,6 +28,8 @@ public class ClientProtocol {
     private final String GAME_START = "GAME_START";
     private final String MOVE_VALID = "MOVE_VALID";
     private final String GAME_OVER = "GAME_OVER";
+    private final String REPLAY_REQUESTED_BY = "REPLAY_REQUESTED_BY";
+    private final String SAVE_REPLAY_DATA = "SAVE_REPLAY_DATA";
 
     private final List<String> savedGamesList = new ArrayList<>();
     private final Set<PlayerDTO> players = new HashSet<>();
@@ -113,6 +115,20 @@ public class ClientProtocol {
                 onPlayerList(parts);
                 break;
 
+            case REPLAY_REQUESTED_BY:
+                onReceiveReplayRequest(parts[1], client);
+                break;
+
+            case SAVE_REPLAY_DATA:
+                if (parts.length > 1) {
+                    String steps = parts[1];
+                    Object controller = Router.getInstance().getCurrentController();
+                    if (controller instanceof GameController) {
+                        ((GameController) controller).setLastGameSteps(steps);
+                    }
+                }
+                break;
+                
             default:
                 break;
         }
@@ -133,12 +149,12 @@ public class ClientProtocol {
 
     private void onGameStart() {
         GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
-        Functions.naviagteTo("fxml/game");
+        Router.getInstance().navigateTo("game");
     }
 
     private void onGameOver(String[] parts, Client client) {
         if (onlineGame.getGameListener() != null && parts.length >= 2) {
-            if(parts.length > 2){
+            if (parts.length > 2) {
                 client.getPlayer().setScore(Integer.parseInt(parts[2]));
             }
             Platform.runLater(() -> onlineGame.getGameListener().onGameOver(parts[1], onlineGame.getOnResultListener()));
@@ -151,11 +167,11 @@ public class ClientProtocol {
         PlayerStatus status = PlayerStatus.IDLE;
 
         client.setPlayer(new PlayerDTO(username, score, status));
-        Functions.naviagteTo("fxml/menu");
+        Router.getInstance().navigateTo("onlineMenu");
     }
 
     private void onRegisterSuccess() {
-        Functions.naviagteTo("fxml/login");
+        Router.getInstance().navigateTo("login");
     }
 
     private void onSavedGamesReceived(String msg, Client client) {
@@ -208,15 +224,16 @@ public class ClientProtocol {
     }
 
     private void onInviteAccepted() {
-        Functions.naviagteTo("fxml/game");
+        Router.getInstance().navigateTo("game");
     }
-    
+
     private void onInviteRejected(final String username) {
         Functions.showInformationAlert("Invitation Rejected", username + " Rejected your invitation");
         if (updatePlayerList != null) {
             Platform.runLater(() -> {
                 updatePlayerList.accept(new ArrayList<>(players));
-            });      
+            });
+        }
     }
 
     private void onPlayerList(String[] parts) {
@@ -239,6 +256,55 @@ public class ClientProtocol {
             Platform.runLater(() -> {
                 updatePlayerList.accept(new ArrayList<>(players));
             });
+        }
+    }
+
+    private void onReceiveReplayRequest(String opponentName, Client client) {
+        Platform.runLater(() -> {
+            Functions.showConfirmAlert(
+                    "Replay Request",
+                    null,
+                    opponentName + " wants to play with you again. Do you accept?",
+                    "Yes, Let's go!",
+                    "No, Exit",
+                    () -> {
+                        String message = "SEND_INVITE:" + opponentName;
+                        client.sendMessage(message);
+                        return true;
+                    },
+                    () -> {
+                        client.sendMessage("MOVE:QUIT_MATCH");
+                        Router.getInstance().navigateTo("onlineMenu");
+                        return true;
+                    }
+            );
+        });
+    }
+
+    private void handleSaveReplayRequest(String steps) {
+        Platform.runLater(() -> {
+            Functions.showConfirmAlert(
+                    "Save A Game",
+                    null,
+                    "Do you want to save this game?",
+                    "Yes, Save",
+                    "Noً",
+                    () -> {
+                        saveStepsToFile(steps);
+                        return true;
+                    },
+                    () -> null
+            );
+        });
+    }
+
+    private void saveStepsToFile(String data) {
+        String fileName = "replay_" + System.currentTimeMillis() + ".txt";
+        try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(fileName))) {
+            writer.write(data);
+            Functions.showInformationAlert("Game Saved", "the Game was saved in File: " + fileName);
+        } catch (java.io.IOException e) {
+            Functions.showErrorAlert(e);
         }
     }
 

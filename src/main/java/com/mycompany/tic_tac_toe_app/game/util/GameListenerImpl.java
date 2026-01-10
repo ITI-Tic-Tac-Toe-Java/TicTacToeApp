@@ -2,6 +2,7 @@ package com.mycompany.tic_tac_toe_app.game.util;
 
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
 import com.mycompany.tic_tac_toe_app.util.Functions;
+import com.mycompany.tic_tac_toe_app.util.Router;
 
 public class GameListenerImpl implements GameListener {
 
@@ -21,7 +22,7 @@ public class GameListenerImpl implements GameListener {
             String videoFile = "";
             if (result.equals("OPPONENT_LEFT")) {
                 Functions.showErrorAlert(new Exception("Your opponent has disconnected!, The game Ended"));
-                Functions.naviagteTo("fxml/menu");
+                Router.getInstance().navigateTo("onlineMenu");
                 ClientProtocol.getInstance().setOnlineGame(null);
                 return;
             }

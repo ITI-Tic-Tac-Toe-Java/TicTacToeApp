@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.media.MediaView?>
+
+<StackPane fx:id="mainRoot" prefHeight="1080" prefWidth="1920"  stylesheets="@../styles/style.css"
+           xmlns:fx="http://javafx.com/fxml/1" 
+           xmlns="http://javafx.com/javafx/25" 
+           fx:controller="com.mycompany.tic_tac_toe_app.MainController">
+
+    <MediaView fx:id="mediaView" fitHeight="1080" fitWidth="1920" preserveRatio="false" />
+
+    <StackPane fx:id="contentPane" alignment="CENTER" />
+
+</StackPane>

@@ -2,28 +2,22 @@ package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.util.Functions;
-import java.io.IOException;
+import com.mycompany.tic_tac_toe_app.util.Router;
 import java.net.URL;
 import java.util.ResourceBundle;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.text.Text;
 
 public class LoginController implements Initializable {
 
     @FXML
-    private TextField userNameTxtField;
+    private TextField usernameField;
     @FXML
-    private TextField passwordTxtField;
-    @FXML
-    private Button signInBtn;
-    @FXML
-    private Text registerLink;
+    private PasswordField passwordField;
 
     private Client client;
 
@@ -33,30 +27,31 @@ public class LoginController implements Initializable {
     }
 
     @FXML
-    private void signIn(ActionEvent event) throws IOException {
-        String userName = userNameTxtField.getText();
-        String password = passwordTxtField.getText();
-        
+    private void handleLogin(ActionEvent event) {
+        String userName = usernameField.getText();
+        String password = passwordField.getText();
+
         if (userName.trim().isEmpty()) {
-            Functions.showErrorAlert(new Exception("Username Field is Requried"));
+            Functions.showInformationAlert("Required Field", "Username Field is Required");
             return;
         }
-        
+
         if (password.trim().isEmpty()) {
-            Functions.showErrorAlert(new Exception("Password Field is Requried"));
+            Functions.showInformationAlert("Required Field", "Password Field is Required");
             return;
         }
-        
-        StringBuilder sb = new StringBuilder();
-        sb.append("LOGIN:").append(userName).append(":").append(password);
 
-        String loginMessage = sb.toString();
-
+        String loginMessage = "LOGIN:" + userName + ":" + password;
         client.sendMessage(loginMessage);
     }
 
     @FXML
-    private void navigateToRegister(MouseEvent event) throws IOException {
-        Functions.naviagteTo("fxml/register");
+    private void handleGuist(ActionEvent event) {
+        Router.getInstance().navigateTo("guestMenu");
+    }
+
+    @FXML
+    private void handleRegister(MouseEvent event) {
+        Router.getInstance().navigateTo("register");
     }
 }

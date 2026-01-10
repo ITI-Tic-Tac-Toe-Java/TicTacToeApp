@@ -31,19 +31,33 @@ public class XOGameLogic {
         return true;
     }
 
-    public boolean hasPlayerWon(int symbol) {
-        return (board[0][0] == symbol && board[0][1] == symbol && board[0][2] == symbol)
-                || (board[1][0] == symbol && board[1][1] == symbol && board[1][2] == symbol)
-                || (board[2][0] == symbol && board[2][1] == symbol && board[2][2] == symbol)
-                || (board[0][0] == symbol && board[1][0] == symbol && board[2][0] == symbol)
-                || (board[0][1] == symbol && board[1][1] == symbol && board[2][1] == symbol)
-                || (board[0][2] == symbol && board[1][2] == symbol && board[2][2] == symbol)
-                || (board[0][0] == symbol && board[1][1] == symbol && board[2][2] == symbol)
-                || (board[0][2] == symbol && board[1][1] == symbol && board[2][0] == symbol);
+    private List<Pair<Integer, Integer>> winningCoords = new ArrayList<>();
+
+    public List<Pair<Integer, Integer>> getWinningCoords() {
+        return winningCoords;
+    }
+
+    public boolean checkWin(int symbol) {
+        winningCoords.clear();
+        int[][] winConditions = {
+            {0, 0, 0, 1, 0, 2}, {1, 0, 1, 1, 1, 2}, {2, 0, 2, 1, 2, 2}, 
+            {0, 0, 1, 0, 2, 0}, {0, 1, 1, 1, 2, 1}, {0, 2, 1, 2, 2, 2}, 
+            {0, 0, 1, 1, 2, 2}, {0, 2, 1, 1, 2, 0} 
+        };
+
+        for (int[] c : winConditions) {
+            if (board[c[0]][c[1]] == symbol && board[c[2]][c[3]] == symbol && board[c[4]][c[5]] == symbol) {
+                winningCoords.add(new Pair<>(c[0], c[1]));
+                winningCoords.add(new Pair<>(c[2], c[3]));
+                winningCoords.add(new Pair<>(c[4], c[5]));
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean isDraw() {
-        return stepCount == 9 && (!hasPlayerWon(X) && !hasPlayerWon(O));
+        return stepCount == 9 && (!checkWin(X) && !checkWin(O));
     }
 
     public int getSymbol(String sym) {
@@ -87,5 +101,8 @@ public class XOGameLogic {
             board[r][c] = EMPTY;
             stepCount--;
         }
+    }
+    public String getSteps() {
+        return steps.toString();
     }
 }
