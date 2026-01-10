@@ -1,50 +1,52 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
-import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
-import com.mycompany.tic_tac_toe_app.util.Functions;
+import com.mycompany.tic_tac_toe_app.util.Router;
+import java.io.File;
 import java.net.URL;
-import java.util.List;
 import java.util.ResourceBundle;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableValue;
-import javafx.event.ActionEvent;
 import javafx.scene.control.ListView;
-
 
 public class SavedGamesController implements Initializable {
 
     @FXML
     private ListView<String> listView;
-    private List<String> savedGames;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        ClientProtocol cp = ClientProtocol.getInstance();
-        
-        savedGames = cp.getSavedGames();
+        loadSavedFiles();
 
-        listView.getItems().clear();
+        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.equals("No Saved Games To Show")) {
+                // 1. نرسل المسار للـ GameController قبل الانتقال
+                GameController.setReplayPath(newVal);
 
-        if (savedGames.isEmpty()) {
-            listView.getItems().add("No Saved Games To Show");
-            listView.setDisable(true);
-        } else {
-            listView.getItems().addAll(savedGames);
-        }
-
-        listView.prefHeightProperty().bind(Bindings.size(listView.getItems()).multiply(listView.getFixedCellSize()).add(2));
-
-        listView.getSelectionModel().selectedItemProperty().addListener(
-                (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            Functions.naviagteTo("fxml/game");
+                // 2. ننتقل لصفحة اللعبة، وهي ستعرف تلقائياً أنها في وضع Replay
+                Router.getInstance().navigateTo("game");
+            }
         });
     }
 
-    @FXML
-    private void backToMenu(ActionEvent event) {
-        Functions.naviagteTo("fxml/menu");
+    private void loadSavedFiles() {
+        listView.getItems().clear();
+        File folder = new File(".");
+        File[] listOfFiles = folder.listFiles((dir, name) -> name.startsWith("replay_") && name.endsWith(".txt"));
+
+        if (listOfFiles == null || listOfFiles.length == 0) {
+            listView.getItems().add("No Saved Games To Show");
+            listView.setDisable(true);
+        } else {
+            listView.setDisable(false);
+            for (File file : listOfFiles) {
+                listView.getItems().add(file.getName());
+            }
+        }
     }
 
+    @FXML
+    private void handleBackToMenu(ActionEvent event) {
+        Router.getInstance().navigateTo("onlineMenu");
+    }
 }
