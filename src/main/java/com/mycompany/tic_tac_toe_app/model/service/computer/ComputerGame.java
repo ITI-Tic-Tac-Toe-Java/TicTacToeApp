@@ -39,28 +39,6 @@ public class ComputerGame implements GameStrategy {
         }
          makeComputerMove();
     }
-
-//    void makeRandomMove() {
-//
-//        String curMove = game.getEmptyPos();
-//        if (!curMove.equals("")) {
-//            String[] rc = curMove.split(",");
-//            int r = Integer.parseInt(rc[0]);
-//            int c = Integer.parseInt(rc[1]);
-//
-//            game.makeMove(r, c, 2);
-//            handleButton.accept(new Pair(r, c));
-//
-////            Button btn = controller.getButton(r, c);
-////
-////            if (btn != null) {
-////                btn.setText("O");
-////                btn.setDisable(true);
-////            }
-//            checkGameStatus(2);
-//        }
-//
-//    }
     
     private void makeComputerMove() {
 
