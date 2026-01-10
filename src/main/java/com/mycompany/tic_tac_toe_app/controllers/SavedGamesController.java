@@ -1,16 +1,16 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
+import com.mycompany.tic_tac_toe_app.model.service.GameRecorder;
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
-import com.mycompany.tic_tac_toe_app.util.Functions;
+import com.mycompany.tic_tac_toe_app.util.Router;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.beans.binding.Bindings;
-import javafx.beans.value.ObservableValue;
 import javafx.scene.control.ListView;
-
+import javafx.scene.control.ListCell;
 
 public class SavedGamesController implements Initializable {
 
@@ -21,24 +21,48 @@ public class SavedGamesController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ClientProtocol cp = ClientProtocol.getInstance();
-        
-        savedGames = cp.getSavedGames();
+        savedGames = GameRecorder.getSavedFiles();
 
         listView.getItems().clear();
 
-        if (savedGames.isEmpty()) {
-            listView.getItems().add("No Saved Games To Show");
+        if (savedGames == null || savedGames.isEmpty()) {
+            listView.getItems().add("No Saved Games");
             listView.setDisable(true);
         } else {
+            listView.setDisable(false);
             listView.getItems().addAll(savedGames);
         }
 
-        listView.prefHeightProperty().bind(Bindings.size(listView.getItems()).multiply(listView.getFixedCellSize()).add(2));
-
-        listView.getSelectionModel().selectedItemProperty().addListener(
-                (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
-            Functions.naviagteTo("fxml/game");
+        listView.setCellFactory(lv -> new ListCell<String>() {
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item);
+                    getStyleClass().add("list-cell");
+                }
+            }
         });
+
+        listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
+            if (newVal != null && !newVal.equals("No Saved Games")) {
+                String steps = GameRecorder.loadGameSteps(newVal);
+
+                Router.getInstance().navigateTo("game");
+
+                Platform.runLater(() -> {
+                    GameController controller = (GameController) Router.getInstance().getCurrentController();
+                    controller.startReplay(steps);
+                });
+            }
+        });
+
     }
 
+    @FXML
+    private void handleBackToMenu() {
+        Router.getInstance().goBack();
+    }
 }

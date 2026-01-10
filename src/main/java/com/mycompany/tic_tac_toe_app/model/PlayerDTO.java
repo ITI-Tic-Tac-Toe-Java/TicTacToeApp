@@ -8,10 +8,6 @@ public class PlayerDTO {
     private int score;
     private PlayerStatus status;
 
-    public enum PlayerStatus {
-        OFFLINE, IDLE, PLAYING
-    }
-
     public PlayerDTO(String userName, int score, PlayerStatus status) {
         this.userName = userName;
         this.score = score;
@@ -42,18 +38,21 @@ public class PlayerDTO {
     public String toString() {
         return String.format("Player (%s, %s, %s)", userName, String.valueOf(score), status.name());
     }
-    
- 
+
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         PlayerDTO player = (PlayerDTO) obj;
         return Objects.equals(userName, player.userName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName); 
+        return Objects.hash(userName);
     }
-   
+
 }

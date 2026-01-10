@@ -70,4 +70,7 @@ public class XOGameLogic {
 //        }
         return "";
     }
+    public String getGameSteps() {
+        return steps.toString();
+    }
 }

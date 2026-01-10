@@ -1,74 +1,53 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
-import com.mycompany.tic_tac_toe_app.App;
+import com.mycompany.tic_tac_toe_app.model.service.ComputerGame;
 import com.mycompany.tic_tac_toe_app.model.service.GameMode;
 import com.mycompany.tic_tac_toe_app.model.service.GameStrategy;
-import com.mycompany.tic_tac_toe_app.model.service.computer.ComputerGame;
-import com.mycompany.tic_tac_toe_app.model.service.local_multiplay.LocalGame;
+import com.mycompany.tic_tac_toe_app.model.service.LocalGame;
 import com.mycompany.tic_tac_toe_app.model.service.online_mode.OnlineGame;
-import java.io.IOException;
-
+import com.mycompany.tic_tac_toe_app.util.Router;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.animation.KeyFrame;
 import javafx.animation.PauseTransition;
+import javafx.animation.Timeline;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
-
-import javafx.scene.control.Label;
-import javafx.scene.image.ImageView;
-import javafx.scene.layout.VBox;
-import javafx.util.Duration;
-
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
-
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 public class GameController implements Initializable {
 
     @FXML
-    private Button _00;
-    @FXML
-    private Button _01;
-    @FXML
-    private Button _02;
-    @FXML
-    private Button _10;
-    @FXML
-    private Button _11;
-    @FXML
-    private Button _12;
-    @FXML
-    private Button _20;
-    @FXML
-    private Button _21;
-    @FXML
-    private Button _22;
+    private Button _00, _01, _02, _10, _11, _12, _20, _21, _22;
     @FXML
     private VBox resultPane;
     @FXML
     private MediaView stateVideo;
 
-    
-    private static GameMode currentMode;
-
-    private GameStrategy gameStrategy;
-    
     private Button[][] boardButtons;
-    
+    private static GameMode currentMode;
+    private GameStrategy gameStrategy;
     private MediaPlayer mediaPlayer;
 
+    // Static setter to pass data between controllers
     public static void setGameMode(GameMode mode) {
         currentMode = mode;
     }
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        boardButtons = new Button[][]{{_00, _01, _02}, {_10, _11, _12}, {_20, _21, _22}};
+        boardButtons = new Button[][]{
+            {_00, _01, _02},
+            {_10, _11, _12},
+            {_20, _21, _22}
+        };
 
         if (currentMode == null) {
             currentMode = GameMode.LOCAL_MULTIPLAYER;
@@ -76,24 +55,19 @@ public class GameController implements Initializable {
 
         switch (currentMode) {
             case SINGLE_PLAYER:
-                gameStrategy = new ComputerGame(this::updateGuiFromComputerMove, this::showResult);
+                gameStrategy = new ComputerGame(this::updateGuiFromComputerMove);
                 break;
             case LOCAL_MULTIPLAYER:
-
-                LocalGame localGame = new LocalGame();
-                localGame.showResultCallback = this::showResult; 
-                gameStrategy = localGame;
+                gameStrategy = new LocalGame(); // Ensure LocalGame accepts callbacks if needed
                 break;
-                
             case ONLINE_MULTIPLAYER:
+                // Pass callbacks for UI updates and Results
                 gameStrategy = new OnlineGame(
-                    this::updateGuiFromComputerMove,
-                    this::showResult,
-                    boardButtons
+                        move -> {
+                        }, // Opponent move is handled inside OnlineGame mostly, but this can play sound
+                        this::showResult,
+                        boardButtons
                 );
-                break;
-                
-            default:
                 break;
         }
     }
@@ -101,59 +75,93 @@ public class GameController implements Initializable {
     @FXML
     private void handleMove(ActionEvent event) {
         Button clickedButton = (Button) event.getSource();
-        String id = clickedButton.getId();
-
-        gameStrategy.createMove(clickedButton, id);
-
+        if (gameStrategy != null) {
+            gameStrategy.createMove(clickedButton, clickedButton.getId());
+        }
     }
 
+    // Callback for Single Player
     private void updateGuiFromComputerMove(Pair<Integer, Integer> move) {
-        int r = move.getKey();
-        int c = move.getValue();
         PauseTransition delay = new PauseTransition(Duration.seconds(0.5));
         delay.setOnFinished(event -> {
-            Button btn = boardButtons[r][c];
-            if (btn != null) {
-                btn.setText("O");
-                btn.setDisable(true);
+            if (move != null) {
+                Button btn = boardButtons[move.getKey()][move.getValue()];
+                if (btn != null) {
+                    btn.setText("O");
+                    btn.setDisable(true);
+                }
             }
         });
         delay.play();
     }
 
-    @FXML
-    private void goBackOnClick(ActionEvent event) throws IOException {
-
-        if (mediaPlayer != null) {
-            mediaPlayer.stop();
-        }
-
-        App.setRoot("fxml/menu");
-    }
-
     public void showResult(String videoFile) {
-
         try {
-
-            Media media = new Media(getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/" + videoFile).toExternalForm());
-            
+            // Stop previous media if exists
             if (mediaPlayer != null) {
-                mediaPlayer.stop(); 
+                mediaPlayer.stop();
+                mediaPlayer.dispose();
             }
-            
-            mediaPlayer = new MediaPlayer(media);
 
-            stateVideo.setMediaPlayer(mediaPlayer);
-            
-            mediaPlayer.play();
-
-            stateVideo.setVisible(true);
-
+            URL mediaUrl = getClass().getResource("/com/mycompany/tic_tac_toe_app/media/" + videoFile);
+            if (mediaUrl != null) {
+                Media media = new Media(mediaUrl.toExternalForm());
+                mediaPlayer = new MediaPlayer(media);
+                stateVideo.setMediaPlayer(mediaPlayer);
+                mediaPlayer.play();
+                stateVideo.setVisible(true);
+                resultPane.setVisible(true);
+            } else {
+                System.err.println("Media file not found: " + videoFile);
+            }
         } catch (Exception e) {
-            System.out.println("Error loading video: " + e.getMessage());
             e.printStackTrace();
         }
+    }
 
-        resultPane.setVisible(true);
+    @FXML
+    private void handleQuitGame(ActionEvent event) {
+        if (mediaPlayer != null) {
+            mediaPlayer.stop();
+            mediaPlayer.dispose();
+        }
+        Router.getInstance().goBack();
+    }
+
+    public void startReplay(String steps) {
+        // ... (Replay logic remains the same) ...
+        // Ensure to clear board first
+        for (Button[] row : boardButtons) {
+            for (Button b : row) {
+                b.setText("");
+                b.setDisable(true);
+            }
+        }
+
+        String[] moves = steps.split(";");
+        Timeline timeline = new Timeline();
+        int delay = 0;
+        for (String m : moves) {
+            if (m.trim().isEmpty()) {
+                continue;
+            }
+            try {
+                String[] parts = m.split(":");
+                if (parts.length < 2) {
+                    continue;
+                }
+                String[] data = parts[1].split(",");
+                int r = Integer.parseInt(data[0]);
+                int c = Integer.parseInt(data[1]);
+                String sym = data[2].equals("1") ? "X" : "O";
+
+                timeline.getKeyFrames().add(new KeyFrame(Duration.seconds(delay++), e -> {
+                    boardButtons[r][c].setText(sym);
+                }));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        }
+        timeline.play();
     }
 }

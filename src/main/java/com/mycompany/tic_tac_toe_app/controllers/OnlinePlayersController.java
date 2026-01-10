@@ -1,122 +1,162 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
+import com.mycompany.tic_tac_toe_app.model.Player;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
+import com.mycompany.tic_tac_toe_app.model.PlayerStatus;
+import com.mycompany.tic_tac_toe_app.util.PopUp;
 import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
-import com.mycompany.tic_tac_toe_app.util.Functions;
-import javafx.event.ActionEvent;
+import com.mycompany.tic_tac_toe_app.util.Router;
+import java.net.URL;
+import java.util.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
-import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.ResourceBundle;
-import java.util.Set;
-import javafx.scene.layout.Priority;
+import javafx.scene.shape.Circle;
 
 public class OnlinePlayersController implements Initializable {
 
     @FXML
-    private ListView<HBox> playersListView;
-    @FXML
-    private Label noPlayersLabel;
-    @FXML
-    private TextField searchBar;
+    private TextField searchField;
 
-    private Set<PlayerDTO> onlinePlayers;
+    @FXML
+    private ListView<Player> playersListView;
+
+    private final ObservableList<Player> players = FXCollections.observableArrayList();
+
     private Client client;
     private ClientProtocol cp;
+    private Set<PlayerDTO> onlinePlayers;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         client = Client.getInstance();
         cp = ClientProtocol.getInstance();
         onlinePlayers = cp.getPlayers();
-        updateListView(new ArrayList<>(onlinePlayers));
+
+        refreshPlayers();
+        setupListViewCell();
+
+        searchField.textProperty().addListener((obs, oldVal, newVal) -> filterList(newVal));
     }
 
-    @FXML
-    private void onSearch(ActionEvent event) {
-        String searchText = searchBar.getText();
-        filterList(searchText);
+    private void refreshPlayers() {
+        loadPlayers(new ArrayList<>(onlinePlayers));
     }
 
-    private void filterList(String searchText) {
-        List<PlayerDTO> filteredList = new ArrayList<>();
+    private void loadPlayers(List<PlayerDTO> serverPlayers) {
+        players.clear();
+        String myName = client.getPlayer().getUserName();
+
+        for (PlayerDTO p : serverPlayers) {
+            if (!p.getUserName().equals(myName)) {
+                players.add(new Player(
+                        p.getUserName(),
+                        PlayerStatus.valueOf(p.getStatus().name())
+                ));
+            }
+        }
+    }
+
+    private void filterList(String text) {
+        String query = text.toLowerCase();
+        List<PlayerDTO> filtered = new ArrayList<>();
+
         for (PlayerDTO p : onlinePlayers) {
-            if (p.getUserName().contains(searchText)) {
-                filteredList.add(p);
+            if (p.getUserName().toLowerCase().contains(query)) {
+                filtered.add(p);
             }
         }
-        updateListView(filteredList);
+
+        loadPlayers(filtered);
     }
 
-    private void updateListView(List<PlayerDTO> players) {
-        playersListView.getItems().clear();
-        if (players.isEmpty()) {
-            playersListView.setVisible(false);
-            noPlayersLabel.setVisible(true);
-        } else {
-            playersListView.setVisible(true);
-            noPlayersLabel.setVisible(false);
-            for (PlayerDTO p : players) {
-                addPlayerToList(p.getUserName(), p.getStatus().name());
+    private void setupListViewCell() {
+        playersListView.setItems(players);
+
+        playersListView.setCellFactory(lv -> new ListCell<>() {
+
+            private final HBox container = new HBox(10);
+            private final Circle statusCircle = new Circle(6);
+            private final Label nameLabel = new Label();
+
+            {
+                container.setAlignment(Pos.CENTER_LEFT);
+                statusCircle.getStyleClass().add("status-circle");
+                container.getChildren().addAll(statusCircle, nameLabel);
             }
-        }
-    }
 
-    private void addPlayerToList(String name, String status) {
-        HBox row = new HBox(10);
-        row.setAlignment(Pos.CENTER_LEFT);
+            @Override
+            protected void updateItem(Player player, boolean empty) {
+                super.updateItem(player, empty);
 
-        VBox details = new VBox(2);
-        Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-        Label statusLabel = new Label(status);
-        if (status.equals("Playing")) {
-            statusLabel.setStyle("-fx-text-fill: #FF827E; -fx-font-size: 12px;");
-        } else if (status.equals("Online")) {
-            statusLabel.setStyle("-fx-text-fill: #00C096; -fx-font-size: 12px;");
-        }
+                if (empty || player == null) {
+                    setGraphic(null);
+                    return;
+                }
 
-        details.getChildren().addAll(nameLabel, statusLabel);
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        row.getChildren().addAll(details, spacer);
+                nameLabel.setText(player.getName());
 
-        Button inviteBtn = new Button("Invite");
+                statusCircle.getStyleClass().removeAll(
+                        "status-online",
+                        "status-ingame",
+                        "status-offline"
+                );
 
-        if (status.equals("Playing")) {
-            inviteBtn.setStyle("-fx-background-color: #ADADAD; -fx-text-fill: white; -fx-background-radius: 15;");
-        } else {
-            inviteBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 15;");
-        }
+                switch (player.getStatus()) {
+                    case IDLE:
+                        statusCircle.getStyleClass().add("status-online");
+                        break;
 
-        inviteBtn.setOnAction(e -> {
-            if (inviteBtn.getText().equals("Invite")) {
-                inviteBtn.setText("Sent");
-                inviteBtn.setDisable(true);
-                client.sendMessage("SEND_INVITE:" + name);
+                    case INGAME:
+                        statusCircle.getStyleClass().add("status-ingame");
+                        break;
+
+                    case OFFLINE:
+                        statusCircle.getStyleClass().add("status-offline");
+                        break;
+                }
+
+                setGraphic(container);
             }
         });
 
-        if (!(name.equals(Client.getInstance().getPlayer().getUserName()))) {
-            row.getChildren().add(inviteBtn);
+        playersListView.getSelectionModel()
+                .selectedItemProperty()
+                .addListener((obs, oldVal, newVal) -> handleSelection(newVal));
+    }
+
+    private void handleSelection(Player player) {
+        if (player == null) {
+            return;
         }
-        
-        playersListView.getItems().add(row);
+
+        if (player.getStatus() == PlayerStatus.IDLE) {
+            PopUp.confermInvitation(player.getName(),", are you ready to send the invitation?", isAccepted -> {
+                if (isAccepted) {
+                    client.sendMessage("SEND_INVITE:" + player.getName());
+                }
+            });
+        } else {
+            showBusyAlert();
+        }
+
+        playersListView.getSelectionModel().clearSelection();
+    }
+
+    private void showBusyAlert() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setHeaderText(null);
+        alert.setContentText("This player is currently busy.");
+        alert.showAndWait();
     }
 
     @FXML
-    private void goBackOnClick(ActionEvent event) {
-        Functions.naviagteTo("fxml/menu");
+    private void handleBackToMenu() {
+        Router.getInstance().goBack();
     }
 }

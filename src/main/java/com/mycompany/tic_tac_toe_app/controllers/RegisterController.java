@@ -1,34 +1,32 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.network.Client;
-import com.mycompany.tic_tac_toe_app.util.Functions;
+import com.mycompany.tic_tac_toe_app.util.Router;
+
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
+
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.input.MouseEvent;
-import javafx.scene.text.Text;
 
 public class RegisterController implements Initializable {
 
-    @FXML
-    private TextField username;
-    @FXML
-    private TextField password;
-    @FXML
-    private TextField confirmPassowrd;
-    @FXML
-    private Button signUpBtn;
-    @FXML
-    private Text signIn;
 
+    @FXML
+    private TextField usernameField;
+    @FXML
+    private PasswordField passwordField;
+    @FXML
+    private PasswordField confirmPasswordField;
+    
     private Client client;
-
+    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         client = Client.getInstance();
@@ -36,9 +34,9 @@ public class RegisterController implements Initializable {
 
     @FXML
     private void signUp(ActionEvent event) throws IOException {
-        String userNameText = username.getText();
-        String uerPasswordText = password.getText();
-        String confirmPasswordText = confirmPassowrd.getText();
+        String userNameText = usernameField.getText();
+        String uerPasswordText = passwordField.getText();
+        String confirmPasswordText = confirmPasswordField.getText();
 
         if (!uerPasswordText.equals(confirmPasswordText)) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -56,6 +54,12 @@ public class RegisterController implements Initializable {
 
     @FXML
     private void navigateToSignIn(MouseEvent event) {
-        Functions.naviagteTo("fxml/login");
+        Router.getInstance().navigateTo("login");
+    }
+    
+    
+    @FXML
+    private void handleRegister(ActionEvent event) {
+        Router.getInstance().navigateTo("login");
     }
 }

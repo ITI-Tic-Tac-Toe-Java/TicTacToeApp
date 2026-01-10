@@ -11,6 +11,7 @@ import javafx.application.Platform;
 
 public class Client extends Thread {
 
+    public static String assignedSymbol = "X";
     private PlayerDTO player;
     private final int port = 5008;
     private final String localHost = "localhost";
@@ -46,8 +47,8 @@ public class Client extends Thread {
 
     public void setPlayer(PlayerDTO player) {
         this.player = player;
-    } 
-    
+    }
+
     public PlayerDTO getPlayer() {
         return player;
     }
@@ -79,5 +80,9 @@ public class Client extends Thread {
         } catch (IOException ex) {
             Platform.runLater(() -> Functions.showErrorAlert(new IOException("Error in closing resources")));
         }
+    }
+
+    public boolean isConnected() {
+        return socket != null && !socket.isClosed();
     }
 }

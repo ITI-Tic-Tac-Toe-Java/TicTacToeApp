@@ -1,10 +1,16 @@
 package com.mycompany.tic_tac_toe_app.network;
 
+import com.mycompany.tic_tac_toe_app.controllers.GameController;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
-import com.mycompany.tic_tac_toe_app.model.PlayerDTO.PlayerStatus;
+import com.mycompany.tic_tac_toe_app.model.PlayerStatus;
+import com.mycompany.tic_tac_toe_app.model.service.GameMode;
+import com.mycompany.tic_tac_toe_app.model.service.GameRecorder;
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import com.mycompany.tic_tac_toe_app.model.service.online_mode.GameListener;
+import com.mycompany.tic_tac_toe_app.util.PopUp;
+import com.mycompany.tic_tac_toe_app.util.Router;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,23 +31,24 @@ public class ClientProtocol {
     private final static String MOVE_VALID = "MOVE_VALID";
     private final static String GAME_OVER = "GAME_OVER";
 
-    private final List<String> savedGamesList = new ArrayList<>();
-    private final Set<PlayerDTO> players = new HashSet<>();
-    private static GameListener gameListener;
+    // Use thread-safe collections or synchronize access
+    private final List<String> savedGamesList = Collections.synchronizedList(new ArrayList<>());
+    private final Set<PlayerDTO> players = Collections.synchronizedSet(new HashSet<>());
 
+    private static GameListener gameListener;
     private static ClientProtocol INSTANCE;
 
     public static void setGameListener(GameListener listener) {
         gameListener = listener;
     }
 
-    private ClientProtocol() {}
+    private ClientProtocol() {
+    }
 
     public synchronized static ClientProtocol getInstance() {
         if (INSTANCE == null) {
             INSTANCE = new ClientProtocol();
         }
-
         return INSTANCE;
     }
 
@@ -57,9 +64,14 @@ public class ClientProtocol {
             case LOGIN_SUCCESS:
                 onLoginSuccess(parts, client);
                 break;
-                
+
             case GAME_START:
-                Platform.runLater(() -> Functions.naviagteTo("fxml/game"));
+                // Ensure symbol is set before navigation
+                Client.assignedSymbol = (parts.length > 1) ? parts[1] : "X";
+                Platform.runLater(() -> {
+                    GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
+                    Router.getInstance().navigateTo("game");
+                });
                 break;
 
             case MOVE_VALID:
@@ -67,18 +79,23 @@ public class ClientProtocol {
                     int r = Integer.parseInt(parts[1]);
                     int c = Integer.parseInt(parts[2]);
                     String sym = parts[3];
-                    Platform.runLater(() -> gameListener.onOpponentMove(r, c, sym));
+                    // Delegate to the listener (OnlineGame)
+                    gameListener.onOpponentMove(r, c, sym);
                 }
                 break;
 
             case GAME_OVER:
                 if (gameListener != null && parts.length >= 2) {
-                    Platform.runLater(() -> gameListener.onGameResult(parts[1]));
+                    String result = parts[1];
+                    String steps = gameListener.getGameSteps();
+                    String fileName = "online_" + System.currentTimeMillis();
+                    GameRecorder.saveGame(fileName, steps);
+                    gameListener.onGameResult(result);
                 }
                 break;
 
             case REGISTER_SUCCESS:
-                onRegisterSuccess();
+                Platform.runLater(() -> Router.getInstance().navigateTo("login"));
                 break;
 
             case HISTORY_RESPONSE:
@@ -86,131 +103,108 @@ public class ClientProtocol {
                 break;
 
             case RECEIVE_INVITE:
-                String inviteSenderUsername = parts[1];
-                onReceiveInvite(inviteSenderUsername, client);
-                break;
-
-            case ERROR:
-                onError(parts[1]);
-                break;
-
-            case INVITE_FAIL:
-                onError(parts[1]);
+                String sender = parts[1];
+                Platform.runLater(() -> {
+                    PopUp.showInvitation(sender, (accepted) -> {
+                        if (accepted) {
+                            client.sendMessage("INVITE_RESPONSE:" + sender + ":ACCEPTED");
+                        } else {
+                            client.sendMessage("INVITE_RESPONSE:" + sender + ":REJECTED");
+                        }
+                    });
+                });
                 break;
 
             case INVITE_ACCEPTED:
-                onInviteAccepted();
+                // If I am the inviter, I get this message. 
+                // Wait for GAME_START or navigate here if logic requires.
+                // Usually GAME_START follows immediately, but safe to set mode.
+                Client.assignedSymbol = (parts.length > 1) ? parts[1] : "X";
+                Platform.runLater(() -> {
+                    GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
+                    Router.getInstance().navigateTo("game");
+                });
                 break;
 
             case INVITE_REJECTED:
-                onInviteRejected(parts[1]);
+                Platform.runLater(() -> Functions.showInformationAlert("Invitation Rejected", parts[1] + " rejected your invitation."));
+                break;
+
+            case INVITE_FAIL:
+                Platform.runLater(() -> Functions.showErrorAlert(new Exception(parts[1])));
                 break;
 
             case PLAYER_LIST:
                 onPlayerList(parts);
                 break;
 
-            default:
+            case ERROR:
+                Platform.runLater(() -> Functions.showErrorAlert(new Exception(parts[1])));
                 break;
         }
-    }
-
-    private void onError(String message) {
-        Functions.showErrorAlert(new Exception(message));
     }
 
     private void onLoginSuccess(String[] parts, Client client) {
         String username = parts[1];
         int score = Integer.parseInt(parts[2]);
-        PlayerStatus status = PlayerStatus.IDLE;
-
-        client.setPlayer(new PlayerDTO(username, score, status));
-        Functions.naviagteTo("fxml/menu");
-    }
-
-    private void onRegisterSuccess() {
-        Functions.naviagteTo("fxml/login");
+        PlayerDTO player = new PlayerDTO(username, score, PlayerStatus.IDLE);
+        client.setPlayer(player);
+        Platform.runLater(() -> Router.getInstance().navigateTo("onlineMenu"));
     }
 
     private void onSavedGamesReceived(String msg, Client client) {
         savedGamesList.clear();
-
-        final String data = msg.substring(HISTORY_RESPONSE.length() + 1);
-
+        String data = msg.substring(HISTORY_RESPONSE.length());
+        if (data.startsWith(":")) {
+            data = data.substring(1); // Handle delimiter
+        }
         if (data.trim().isEmpty()) {
             return;
         }
 
-        final String[] games = data.split(";");
-
+        String[] games = data.split(";");
         for (String gameStr : games) {
-            final String[] details = gameStr.split(",");
-
+            String[] details = gameStr.split(",");
             if (details.length >= 4) {
-                final String id = details[0];
-                final String opponent = details[1];
-                final String result = details[2];
-                final String date = details[3];
-
-                final String[] dates = date.split(" ");
-
-                final String displayText = String.format("Match #%s: %s Vs %s (%s) %s", id, client.getName(), opponent, result, dates[0]);
-
-                savedGamesList.add(displayText);
+                // Formatting safety
+                String display = String.format("Match #%s: %s Vs %s (%s) %s",
+                        details[0], client.getName(), details[1], details[2], details[3]);
+                savedGamesList.add(display);
             }
         }
     }
 
-    private void onReceiveInvite(final String senderUserName, final Client client) {
-        Functions.showConfirmAlert(
-                "Match Request",
-                null,
-                senderUserName + " sent you an invitation to play a game",
-                "Accept",
-                "Decline",
-                () -> {
-                    String message = new StringBuilder("INVITE_RESPONSE:").append(senderUserName).append(":").append("ACCEPTED").toString();
-                    client.sendMessage(message);
-                    Functions.naviagteTo("fxml/game");
-                    return true;
-                },
-                () -> {
-                    String message = new StringBuilder("INVITE_RESPONSE:").append(senderUserName).append(":").append("REJECTED").toString();
-                    client.sendMessage(message);
-                    return true;
-                });
-    }
-
-    private void onInviteAccepted() {
-        Functions.naviagteTo("fxml/game");
-    }
-
-    private void onInviteRejected(final String username) {
-        Functions.showInformationAlert("Invitation Rejected", username + " Rejected your invitation");
-    }
-
     private void onPlayerList(String[] parts) {
-        final String playersDataWithSemiColon = parts[1];
+        players.clear(); // Clear old list
+        if (parts.length < 2) {
+            return;
+        }
 
-        final String[] playersCsv = playersDataWithSemiColon.split(";");
+        String playersData = parts[1];
+        if (playersData.isEmpty()) {
+            return;
+        }
 
-        for (final String csvValue : playersCsv) {
-            final String[] player = csvValue.split(",");
-
-            final String username = player[0];
-            final int score = Integer.parseInt(player[1]);
-
-            PlayerDTO playerDTO = new PlayerDTO(username, score, PlayerStatus.IDLE);
-
-            players.add(playerDTO);
+        String[] playersCsv = playersData.split(";");
+        for (String csvValue : playersCsv) {
+            String[] player = csvValue.split(",");
+            if (player.length >= 2) {
+                String username = player[0];
+                int score = Integer.parseInt(player[1]);
+                // Assuming status is available or default to IDLE
+                players.add(new PlayerDTO(username, score, PlayerStatus.IDLE));
+            }
         }
     }
 
+    // Return copies or synchronized views to avoid ConcurrentModificationException in UI
     public List<String> getSavedGames() {
-        return savedGamesList;
+        return new ArrayList<>(savedGamesList);
     }
 
     public Set<PlayerDTO> getPlayers() {
-        return players;
+        synchronized (players) {
+            return new HashSet<>(players);
+        }
     }
 }
