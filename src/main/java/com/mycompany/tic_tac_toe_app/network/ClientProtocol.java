@@ -138,8 +138,10 @@ public class ClientProtocol {
     }
 
     private void onGameOver(String[] parts, Client client) {
-        if (onlineGame.getGameListener() != null && parts.length >= 3) {
-            client.getPlayer().setScore(Integer.parseInt(parts[2]));
+        if (onlineGame.getGameListener() != null && parts.length >= 2) {
+            if(parts.length > 2){
+                client.getPlayer().setScore(Integer.parseInt(parts[2]));
+            }
             Platform.runLater(() -> onlineGame.getGameListener().onGameOver(parts[1], onlineGame.getOnResultListener()));
         }
     }
@@ -236,7 +238,9 @@ public class ClientProtocol {
         }
 
         if (updatePlayerList != null) {
-            updatePlayerList.accept(new ArrayList<>(players));
+            Platform.runLater(() -> {
+                updatePlayerList.accept(new ArrayList<>(players));
+            });
         }
     }
 

@@ -7,6 +7,7 @@ import com.mycompany.tic_tac_toe_app.game.computer.ComputerGame;
 import com.mycompany.tic_tac_toe_app.game.local_multiplay.LocalGame;
 import com.mycompany.tic_tac_toe_app.game.util.GameListener;
 import com.mycompany.tic_tac_toe_app.game.online_mode.OnlineGame;
+import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.application.Platform;
 import javafx.scene.control.Button;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -58,6 +60,10 @@ public class GameController implements Initializable {
     private GameListener gameListener;
 
     private static int aiDepth = 3;
+    @FXML
+    private Button goBackBtn;
+    @FXML
+    private StackPane stackPane;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -159,6 +165,7 @@ public class GameController implements Initializable {
 
             mediaPlayer.setOnReady(() -> {
                 Platform.runLater(() -> {
+                    goBackBtn.setVisible(false);
                     stateVideo.setVisible(true);
                     mediaPlayer.play();
                     System.out.println("Playing video: " + videoFile);
@@ -178,9 +185,10 @@ public class GameController implements Initializable {
                 Platform.runLater(() -> {
                     for (Button[] row : boardButtons) {
                         for (Button btn : row) {
-                            btn.setDisable(false); // Re-enable all buttons
+                            btn.setDisable(false);
                         }
                     }
+                    Functions.naviagteTo("fxml/menu");
                 });
             });
 
@@ -200,6 +208,7 @@ public class GameController implements Initializable {
             mediaPlayer.dispose();
             mediaPlayer = null;
         }
+        Client.getInstance().sendMessage("GAME_DISCONNECT");
         Functions.naviagteTo("fxml/menu");
     }
 }

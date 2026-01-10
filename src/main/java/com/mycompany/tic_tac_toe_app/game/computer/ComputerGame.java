@@ -5,7 +5,6 @@ import static com.mycompany.tic_tac_toe_app.game.XOGameLogic.Symbol.X;
 import com.mycompany.tic_tac_toe_app.game.util.GameListener;
 import com.mycompany.tic_tac_toe_app.game.util.GameListenerImpl;
 import com.mycompany.tic_tac_toe_app.game.util.OfflineGameStrategy;
-import java.util.function.Consumer;
 import javafx.util.Pair;
 
 public class ComputerGame extends OfflineGameStrategy {
@@ -35,7 +34,7 @@ public class ComputerGame extends OfflineGameStrategy {
     @Override
     public boolean checkGameStatus(int player) {
         if (game.hasPlayerWon(player)) {
-            gameListener.onGameOver(player == X ? "win.mp4" : "draw.mp4", onResultListener);
+            gameListener.onGameOver(player == X ? "win.mp4" : "lose.mp4", onResultListener);
             return true;
         }
 
