@@ -235,7 +235,7 @@ public class ClientProtocol {
             });
         }
     }
-    }
+
     private void onPlayerList(String[] parts) {
         final String playersDataWithSemiColon = parts[1];
 
