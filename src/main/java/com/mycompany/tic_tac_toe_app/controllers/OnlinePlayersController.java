@@ -3,7 +3,8 @@ package com.mycompany.tic_tac_toe_app.controllers;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
 import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
-import com.mycompany.tic_tac_toe_app.util.Functions;
+import com.mycompany.tic_tac_toe_app.util.Router;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -13,24 +14,23 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
-import javafx.scene.layout.VBox;
+
+import javafx.scene.shape.Circle;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.function.Consumer;
-import javafx.scene.layout.Priority;
 
 public class OnlinePlayersController implements Initializable {
 
     @FXML
     private ListView<HBox> playersListView;
     @FXML
-    private Label noPlayersLabel;
-    @FXML
-    private TextField searchBar;
+    private TextField searchField;
 
     private Set<PlayerDTO> onlinePlayers;
     private Client client;
@@ -42,26 +42,24 @@ public class OnlinePlayersController implements Initializable {
         client = Client.getInstance();
         cp = ClientProtocol.getInstance();
         onlinePlayers = cp.getPlayers();
-        
-        updateList = (List<PlayerDTO> players) -> {
-             updateListView(new ArrayList<>(players));
-        };
-        
-        cp.setOnNewPlayerListener(updateList);
-        
-        updateListView(new ArrayList<>(onlinePlayers));
-    }
 
-    @FXML
-    private void onSearch(ActionEvent event) {
-        String searchText = searchBar.getText();
-        filterList(searchText);
+        updateList = (List<PlayerDTO> players) -> {
+            Platform.runLater(() -> updateListView(new ArrayList<>(players)));
+        };
+
+        cp.setOnNewPlayerListener(updateList);
+
+        searchField.textProperty().addListener((observable, oldValue, newValue) -> {
+            filterList(newValue);
+        });
+
+        updateListView(new ArrayList<>(onlinePlayers));
     }
 
     private void filterList(String searchText) {
         List<PlayerDTO> filteredList = new ArrayList<>();
         for (PlayerDTO p : onlinePlayers) {
-            if (p.getUserName().contains(searchText)) {
+            if (p.getUserName().toLowerCase().contains(searchText.toLowerCase())) {
                 filteredList.add(p);
             }
         }
@@ -70,13 +68,8 @@ public class OnlinePlayersController implements Initializable {
 
     private void updateListView(List<PlayerDTO> players) {
         playersListView.getItems().clear();
-        if (players.isEmpty()) {
-            playersListView.setVisible(false);
-            noPlayersLabel.setVisible(true);
-        } else {
-            playersListView.setVisible(true);
-            noPlayersLabel.setVisible(false);
-            for (PlayerDTO p : players) {
+        for (PlayerDTO p : players) {
+            if (!p.getUserName().equals(client.getPlayer().getUserName())) {
                 addPlayerToList(p.getUserName(), p.getStatus().name());
             }
         }
@@ -86,46 +79,40 @@ public class OnlinePlayersController implements Initializable {
         HBox row = new HBox(10);
         row.setAlignment(Pos.CENTER_LEFT);
 
-        VBox details = new VBox(2);
-        Label nameLabel = new Label(name);
-        nameLabel.setStyle("-fx-font-weight: bold; -fx-font-size: 14px;");
-        Label statusLabel = new Label(status);
-        if (status.equals("Playing")) {
-            statusLabel.setStyle("-fx-text-fill: #FF827E; -fx-font-size: 12px;");
-        } else if (status.equals("Online")) {
-            statusLabel.setStyle("-fx-text-fill: #00C096; -fx-font-size: 12px;");
+        Circle statusDot = new Circle(5);
+        statusDot.getStyleClass().add("status-circle");
+
+        if (status.equalsIgnoreCase("Playing")) {
+            statusDot.getStyleClass().add("status-ingame");
+        } else {
+            statusDot.getStyleClass().add("status-online"); 
         }
 
-        details.getChildren().addAll(nameLabel, statusLabel);
+        Label nameLabel = new Label(name);
+        nameLabel.getStyleClass().add("medium-text"); 
+
         Region spacer = new Region();
         HBox.setHgrow(spacer, Priority.ALWAYS);
-        row.getChildren().addAll(details, spacer);
 
-        Button inviteBtn = new Button("Invite");
+        Button inviteBtn = new Button("INVITE");
 
-        if (status.equals("Playing")) {
-            inviteBtn.setStyle("-fx-background-color: #ADADAD; -fx-text-fill: white; -fx-background-radius: 15;");
-        } else {
-            inviteBtn.setStyle("-fx-background-color: #2196F3; -fx-text-fill: white; -fx-background-radius: 15;");
+        if (status.equalsIgnoreCase("Playing")) {
+            inviteBtn.setDisable(true);
+            inviteBtn.setOpacity(0.5);
         }
 
         inviteBtn.setOnAction(e -> {
-            if (inviteBtn.getText().equals("Invite")) {
-                inviteBtn.setText("Sent");
-                inviteBtn.setDisable(true);
-                client.sendMessage("SEND_INVITE:" + name);
-            }
+            inviteBtn.setText("SENT");
+            inviteBtn.setDisable(true);
+            client.sendMessage("SEND_INVITE:" + name);
         });
 
-        if (!(name.equals(Client.getInstance().getPlayer().getUserName()))) {
-            row.getChildren().add(inviteBtn);
-        }
-
+        row.getChildren().addAll(statusDot, nameLabel, spacer, inviteBtn);
         playersListView.getItems().add(row);
     }
 
     @FXML
-    private void goBackOnClick(ActionEvent event) {
-        Functions.naviagteTo("fxml/menu");
+    private void handleBackToMenu(ActionEvent event) {
+        Router.getInstance().navigateTo("onlineMenu");
     }
 }
