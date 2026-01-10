@@ -38,7 +38,6 @@ public class ClientProtocol {
     public void setOnNewPlayerListener(Consumer<List<PlayerDTO>> updatePlayerList) {
         this.updatePlayerList = updatePlayerList;
     }
-
     private static ClientProtocol INSTANCE;
 
     public void setOnlineGame(OnlineGame onlineGame) {
@@ -211,14 +210,13 @@ public class ClientProtocol {
     private void onInviteAccepted() {
         Functions.naviagteTo("fxml/game");
     }
-
+    
     private void onInviteRejected(final String username) {
         Functions.showInformationAlert("Invitation Rejected", username + " Rejected your invitation");
         if (updatePlayerList != null) {
             Platform.runLater(() -> {
                 updatePlayerList.accept(new ArrayList<>(players));
-            });
-        }
+            });      
     }
 
     private void onPlayerList(String[] parts) {
