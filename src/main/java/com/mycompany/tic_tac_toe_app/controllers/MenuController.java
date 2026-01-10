@@ -46,7 +46,7 @@ public class MenuController implements Initializable {
         String[] rankColor = player.getRank();
 
         rankNumber.setText(rankColor[0]);
-        rankNumber.setTextFill(Color.web(rankColor[1]));
+        rankNumber.setTextFill(Color.web(rankColor[1])); 
     }
 
     @FXML
