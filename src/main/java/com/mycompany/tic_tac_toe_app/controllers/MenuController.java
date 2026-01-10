@@ -43,27 +43,16 @@ public class MenuController implements Initializable {
 
         userName.setText(player.getUserName());
         pointsNumber.setText(String.valueOf(player.getScore()));
-        
-        updateRankDisplay(player.getScore());
-    }
-    
-    private void updateRankDisplay(int score) {        
-        if (score >= 100) {
-            rankNumber.setText("Gold");
-            rankNumber.setTextFill(Color.web("#FFD700"));
-        } else if (score >= 50) {
-            rankNumber.setText("Silver");
-            rankNumber.setTextFill(Color.web("#C0C0C0"));
-        } else {
-            rankNumber.setText("Bronze");
-            rankNumber.setTextFill(Color.web("#CD7F32")); 
-        }
+        String[] rankColor = player.getRank();
+
+        rankNumber.setText(rankColor[0]);
+        rankNumber.setTextFill(Color.web(rankColor[1])); 
     }
 
     @FXML
     private void singlePlayerAction(ActionEvent event) {
-        GameController.setGameMode(GameMode.SINGLE_PLAYER);
-        Functions.naviagteTo("fxml/game");
+       GameController.setGameMode(GameMode.SINGLE_PLAYER);
+        Functions.naviagteTo("fxml/singlePlayerLevel");
     }
 
     @FXML
@@ -88,4 +77,6 @@ public class MenuController implements Initializable {
         client.sendMessage("GET_ONLINE_PLAYERS");
         Functions.naviagteTo("fxml/onlinePlayers");
     }
+
+
 }

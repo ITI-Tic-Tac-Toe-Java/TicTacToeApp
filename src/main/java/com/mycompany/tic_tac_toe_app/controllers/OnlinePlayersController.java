@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.Set;
+import java.util.function.Consumer;
 import javafx.scene.layout.Priority;
 
 public class OnlinePlayersController implements Initializable {
@@ -34,12 +35,20 @@ public class OnlinePlayersController implements Initializable {
     private Set<PlayerDTO> onlinePlayers;
     private Client client;
     private ClientProtocol cp;
+    private Consumer<List<PlayerDTO>> updateList;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         client = Client.getInstance();
         cp = ClientProtocol.getInstance();
         onlinePlayers = cp.getPlayers();
+        
+        updateList = (List<PlayerDTO> players) -> {
+             updateListView(new ArrayList<>(players));
+        };
+        
+        cp.setOnNewPlayerListener(updateList);
+        
         updateListView(new ArrayList<>(onlinePlayers));
     }
 

@@ -33,8 +33,11 @@ public class ClientProtocol {
     private final Set<PlayerDTO> players = new HashSet<>();
     private static OnlineGame onlineGame;
 
-    private Consumer<String> onInviteRejected;
-    
+    private Consumer<List<PlayerDTO>> updatePlayerList;
+
+    public void setOnNewPlayerListener(Consumer<List<PlayerDTO>> updatePlayerList) {
+        this.updatePlayerList = updatePlayerList;
+    }
     private static ClientProtocol INSTANCE;
 
     public void setOnlineGame(OnlineGame onlineGame) {
@@ -66,23 +69,15 @@ public class ClientProtocol {
                 break;
 
             case GAME_START:
-                GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
-                Platform.runLater(() -> Functions.naviagteTo("fxml/game"));
+                onGameStart();
                 break;
 
             case MOVE_VALID:
-                if (onlineGame.getGameListener() != null && parts.length >= 4) {
-                    int r = Integer.parseInt(parts[1]);
-                    int c = Integer.parseInt(parts[2]);
-                    String sym = parts[3];
-                    Platform.runLater(() -> onlineGame.getGameListener().onPlayerMove(r, c, sym,onlineGame.getOnMoveListener()));
-                }
+                onMoveValid(parts);
                 break;
 
             case GAME_OVER:
-                if (onlineGame.getGameListener() != null && parts.length >= 2) {
-                    Platform.runLater(() -> onlineGame.getGameListener().onGameOver(parts[1], onlineGame.getOnResultListener()));
-                }
+                onGameOver(parts, client);
                 break;
 
             case REGISTER_SUCCESS:
@@ -127,6 +122,29 @@ public class ClientProtocol {
         Functions.showErrorAlert(new Exception(message));
     }
 
+    private void onMoveValid(String[] parts) {
+        if (onlineGame.getGameListener() != null && parts.length >= 4) {
+            int r = Integer.parseInt(parts[1]);
+            int c = Integer.parseInt(parts[2]);
+            String sym = parts[3];
+            onlineGame.getGameListener().onPlayerMove(r, c, sym, onlineGame.getOnMoveListener());
+        }
+    }
+
+    private void onGameStart() {
+        GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
+        Functions.naviagteTo("fxml/game");
+    }
+
+    private void onGameOver(String[] parts, Client client) {
+        if (onlineGame.getGameListener() != null && parts.length >= 2) {
+            if(parts.length > 2){
+                client.getPlayer().setScore(Integer.parseInt(parts[2]));
+            }
+            Platform.runLater(() -> onlineGame.getGameListener().onGameOver(parts[1], onlineGame.getOnResultListener()));
+        }
+    }
+
     private void onLoginSuccess(String[] parts, Client client) {
         String username = parts[1];
         int score = Integer.parseInt(parts[2]);
@@ -169,7 +187,7 @@ public class ClientProtocol {
         }
     }
 
-    private void onReceiveInvite(final String senderUserName, final Client client) {
+    private void onReceiveInvite(final String senderUserName, Client client) {
         Functions.showConfirmAlert(
                 "Match Request",
                 null,
@@ -186,22 +204,19 @@ public class ClientProtocol {
                     client.sendMessage(message);
                     return true;
                 });
+
     }
 
     private void onInviteAccepted() {
         Functions.naviagteTo("fxml/game");
     }
-
-    public void setOnInviteRejected(Consumer<String> callback) {
-        this.onInviteRejected = callback;
-    }
     
     private void onInviteRejected(final String username) {
         Functions.showInformationAlert("Invitation Rejected", username + " Rejected your invitation");
-        
-        if (onInviteRejected != null) {
-            onInviteRejected.accept(username);
-        }
+        if (updatePlayerList != null) {
+            Platform.runLater(() -> {
+                updatePlayerList.accept(new ArrayList<>(players));
+            });      
     }
 
     private void onPlayerList(String[] parts) {
@@ -215,15 +230,15 @@ public class ClientProtocol {
             final String username = player[0];
             final int score = Integer.parseInt(player[1]);
 
-            if (Client.getInstance().getPlayer() != null && 
-                Client.getInstance().getPlayer().getUserName().equals(username)) {
-                
-                Client.getInstance().getPlayer().setScore(score);
-            }
-            
             PlayerDTO playerDTO = new PlayerDTO(username, score, PlayerStatus.IDLE);
 
             players.add(playerDTO);
+        }
+
+        if (updatePlayerList != null) {
+            Platform.runLater(() -> {
+                updatePlayerList.accept(new ArrayList<>(players));
+            });
         }
     }
 

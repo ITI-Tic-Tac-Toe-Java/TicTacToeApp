@@ -34,6 +34,23 @@ public class PlayerDTO {
         return score;
     }
 
+    public String[] getRank() {
+        String[] rankColor = new String[2];
+
+        if (score >= 100) {
+            rankColor[0] = "Gold";
+            rankColor[1] = "#FFD700";
+        } else if (score >= 50) {
+            rankColor[0] = "Silver";
+            rankColor[1] = "#C0C0C0";
+        } else {
+            rankColor[0] = "Bronze";
+            rankColor[1] = "#CD7F32";
+        }
+        
+        return rankColor;
+    }
+
     public PlayerStatus getStatus() {
         return status;
     }
@@ -42,18 +59,21 @@ public class PlayerDTO {
     public String toString() {
         return String.format("Player (%s, %s, %s)", userName, String.valueOf(score), status.name());
     }
-    
- 
+
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null || getClass() != obj.getClass()) {
+            return false;
+        }
         PlayerDTO player = (PlayerDTO) obj;
         return Objects.equals(userName, player.userName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userName); 
+        return Objects.hash(userName);
     }
-   
+
 }

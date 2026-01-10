@@ -9,6 +9,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.beans.binding.Bindings;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
 import javafx.scene.control.ListView;
 
 
@@ -39,6 +40,11 @@ public class SavedGamesController implements Initializable {
                 (ObservableValue<? extends String> observable, String oldValue, String newValue) -> {
             Functions.naviagteTo("fxml/game");
         });
+    }
+
+    @FXML
+    private void backToMenu(ActionEvent event) {
+        Functions.naviagteTo("fxml/menu");
     }
 
 }

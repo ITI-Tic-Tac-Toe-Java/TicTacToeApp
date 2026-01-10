@@ -7,17 +7,18 @@ import com.mycompany.tic_tac_toe_app.game.computer.ComputerGame;
 import com.mycompany.tic_tac_toe_app.game.local_multiplay.LocalGame;
 import com.mycompany.tic_tac_toe_app.game.util.GameListener;
 import com.mycompany.tic_tac_toe_app.game.online_mode.OnlineGame;
+import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-
+import javafx.application.Platform;
 import javafx.scene.control.Button;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -58,6 +59,12 @@ public class GameController implements Initializable {
 
     private GameListener gameListener;
 
+    private static int aiDepth = 3;
+    @FXML
+    private Button goBackBtn;
+    @FXML
+    private StackPane stackPane;
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         boardButtons = new Button[][]{{_00, _01, _02}, {_10, _11, _12}, {_20, _21, _22}};
@@ -73,7 +80,8 @@ public class GameController implements Initializable {
                 gameStrategy = new ComputerGame(
                         gameListener,
                         this::onMove,
-                        this::showResult
+                        this::showResult,
+                        aiDepth
                 );
 
                 break;
@@ -103,6 +111,10 @@ public class GameController implements Initializable {
         currentMode = gameMode;
     }
 
+    public static void setAiDepth(int depth) {
+        aiDepth = depth;
+    }
+
     @FXML
     private void handlePlayerMove(ActionEvent event) {
         Button clickedButton = (Button) event.getSource();
@@ -124,36 +136,79 @@ public class GameController implements Initializable {
 
     public void showResult(String videoFile) {
         try {
+            URL videoUrl = getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/" + videoFile);
 
-            Media media = new Media(getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/" + videoFile).toExternalForm());
+            if (videoUrl == null) {
+                System.out.println("Video file not found: " + videoFile);
+                return;
+            }
+
+            System.out.println("Video URL: " + videoUrl.toExternalForm());
 
             if (mediaPlayer != null) {
                 mediaPlayer.stop();
+                mediaPlayer.dispose();
                 mediaPlayer = null;
             }
 
+            Media media = new Media(videoUrl.toExternalForm());
             mediaPlayer = new MediaPlayer(media);
 
-            stateVideo.setMediaPlayer(mediaPlayer);
+            Platform.runLater(() -> {
+                stateVideo.setMediaPlayer(mediaPlayer);
+                for (Button[] row : boardButtons) {
+                    for (Button btn : row) {
+                        btn.setDisable(true);
+                    }
+                }
+            });
 
-            mediaPlayer.play();
+            mediaPlayer.setOnReady(() -> {
+                Platform.runLater(() -> {
+                    goBackBtn.setVisible(false);
+                    stateVideo.setVisible(true);
+                    mediaPlayer.play();
+                    System.out.println("Playing video: " + videoFile);
+                });
+            });
 
-            stateVideo.setVisible(true);
-            System.out.println("video showed with video file " + videoFile);
+            mediaPlayer.setOnError(() -> {
+                System.out.println("Error with MediaPlayer: " + mediaPlayer.getError().getMessage());
+                mediaPlayer.getError().printStackTrace();  // More detailed error
+            });
+
+            mediaPlayer.setOnEndOfMedia(() -> {
+                mediaPlayer.stop();
+                mediaPlayer.dispose();
+                mediaPlayer = null;
+
+                Platform.runLater(() -> {
+                    for (Button[] row : boardButtons) {
+                        for (Button btn : row) {
+                            btn.setDisable(false);
+                        }
+                    }
+                    Functions.naviagteTo("fxml/menu");
+                });
+            });
+
+            mediaPlayer.getMedia().getSource();
+
+            resultPane.setVisible(true);
         } catch (Exception e) {
             System.out.println("Error loading video: " + e.getMessage());
             e.printStackTrace();
         }
-
-        resultPane.setVisible(true);
     }
 
     @FXML
     private void goBackOnClick(ActionEvent event) throws IOException {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
+            mediaPlayer.dispose();
             mediaPlayer = null;
         }
+        Client.getInstance().sendMessage("GAME_DISCONNECT");
         Functions.naviagteTo("fxml/menu");
     }
 }
