@@ -14,6 +14,7 @@ import com.mycompany.tic_tac_toe_app.util.Functions;
 import com.mycompany.tic_tac_toe_app.util.Router;
 import java.net.URL;
 import java.util.ResourceBundle;
+import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -23,6 +24,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 public class GameController implements Initializable {
@@ -37,7 +39,7 @@ public class GameController implements Initializable {
     private static int aiDepth = 3;
     private String lastGameSteps = "";
 
-    // متغيرات التحكم في وضع العرض
+    
     private boolean isReplayMode = false;
     private static String replayFilePath = null;
 
@@ -79,9 +81,6 @@ public class GameController implements Initializable {
             if (line != null && !line.isEmpty()) {
                 String[] moves = line.split(";");
                 for (String move : moves) {
-                    if (move.trim().isEmpty()) {
-                        continue;
-                    }
 
                     String[] parts = move.split(":");
                     String[] coords = parts[1].split(",");
@@ -214,7 +213,7 @@ public class GameController implements Initializable {
             rootPane.getChildren().add(videoOverlay);
             mediaPlayer.play();
 
-            javafx.animation.PauseTransition delay = new javafx.animation.PauseTransition(javafx.util.Duration.seconds(3));
+            PauseTransition delay = new PauseTransition(Duration.seconds(3));
             delay.setOnFinished(e -> {
                 mediaPlayer.stop();
                 rootPane.getChildren().remove(videoOverlay);
@@ -233,7 +232,7 @@ public class GameController implements Initializable {
     private void askToSaveGame() {
         Functions.showConfirmAlert("Save Match", null, "Would you like to save this match replay?", "Yes", "No",
                 () -> {
-                    saveReplayToFile(lastGameSteps);
+                    ((OnlineGame) gameStrategy).saveReplayToFile(lastGameSteps);
                     lastGameSteps = "";
                     askToPlayAgain();
                     return null;
@@ -244,16 +243,6 @@ public class GameController implements Initializable {
                     return null;
                 }
         );
-    }
-
-    private void saveReplayToFile(String data) {
-        String fileName = "replay_" + System.currentTimeMillis() + ".txt";
-        try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(fileName))) {
-            writer.write(data);
-            Platform.runLater(() -> Functions.showInformationAlert("Saved", "Replay saved: " + fileName));
-        } catch (java.io.IOException e) {
-            Platform.runLater(() -> Functions.showErrorAlert(e));
-        }
     }
 
     private void askToPlayAgain() {

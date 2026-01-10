@@ -102,4 +102,7 @@ public class XOGameLogic {
             stepCount--;
         }
     }
+    public String getSteps() {
+        return steps.toString();
+    }
 }
