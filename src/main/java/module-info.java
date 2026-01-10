@@ -8,4 +8,5 @@ module com.mycompany.tic_tac_toe_app {
     opens com.mycompany.tic_tac_toe_app.controllers to javafx.fxml;
 
     exports com.mycompany.tic_tac_toe_app;
+
 }

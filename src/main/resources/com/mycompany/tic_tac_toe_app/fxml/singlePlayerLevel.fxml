@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 126ef40fa525e66f24ec0bb5ab1fd57493dd54cc
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -7,6 +10,7 @@
 
 
 <AnchorPane id="AnchorPane" fx:id="singlePlayerLevels" prefHeight="400.0" prefWidth="600.0" style="-fx-max-width: 1440; -fx-min-width: 1440; -fx-pref-width: 1440; -fx-max-height: 1024; -fx-min-height: 1024; -fx-pref-height: 1024;" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/25" fx:controller="com.mycompany.tic_tac_toe_app.controllers.SinglePlayerLevelController">
+<<<<<<< HEAD
    <children>
       <Button fx:id="easyLevel" layoutX="601.0" layoutY="215.0" mnemonicParsing="false" onAction="#onEasyClick" prefHeight="76.0" prefWidth="300.0" style="-fx-background-color: GREEN;" text="Easy" textFill="WHITE">
          <font>
@@ -30,3 +34,28 @@
       </Button>
    </children>
 </AnchorPane>
+=======
+    <children>
+        <Button fx:id="easyLevel" layoutX="601.0" layoutY="215.0" mnemonicParsing="false" onAction="#onEasyClick" prefHeight="76.0" prefWidth="300.0" style="-fx-background-color: GREEN;" text="Easy" textFill="WHITE">
+            <font>
+                <Font size="21.0" />
+            </font>
+        </Button>
+        <Label layoutX="624.0" layoutY="112.0" text="select the level">
+            <font>
+                <Font size="39.0" />
+            </font>
+        </Label>
+        <Button fx:id="mediumLevel" layoutX="601.0" layoutY="319.0" mnemonicParsing="false" onAction="#onMediumClick" prefHeight="76.0" prefWidth="300.0" style="-fx-background-color: ORANGE;" text="Medium" textFill="WHITE">
+            <font>
+                <Font size="21.0" />
+            </font>
+        </Button>
+        <Button fx:id="hardLevel" layoutX="601.0" layoutY="435.0" mnemonicParsing="false" onAction="#onHardClick" prefHeight="76.0" prefWidth="300.0" style="-fx-background-color: RED;" text="Hard" textFill="WHITE">
+            <font>
+                <Font size="21.0" />
+            </font>
+        </Button>
+    </children>
+</AnchorPane>
+>>>>>>> 126ef40fa525e66f24ec0bb5ab1fd57493dd54cc

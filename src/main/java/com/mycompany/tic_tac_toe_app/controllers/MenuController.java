@@ -2,7 +2,7 @@ package com.mycompany.tic_tac_toe_app.controllers;
 
 import com.mycompany.tic_tac_toe_app.App;
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
-import com.mycompany.tic_tac_toe_app.model.service.GameMode;
+import com.mycompany.tic_tac_toe_app.game.util.GameMode;
 import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import java.io.IOException;
@@ -13,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.paint.Color;
 
 public class MenuController implements Initializable {
 
@@ -42,13 +43,15 @@ public class MenuController implements Initializable {
 
         userName.setText(player.getUserName());
         pointsNumber.setText(String.valueOf(player.getScore()));
-        rankNumber.setText("Bronze");
+        String[] rankColor = player.getRank();
+
+        rankNumber.setText(rankColor[0]);
+        rankNumber.setTextFill(Color.web(rankColor[1])); 
     }
 
     @FXML
     private void singlePlayerAction(ActionEvent event) {
-        GameController.setGameMode(GameMode.SINGLE_PLAYER);
-        //Functions.naviagteTo("fxml/game");
+       GameController.setGameMode(GameMode.SINGLE_PLAYER);
         Functions.naviagteTo("fxml/singlePlayerLevel");
     }
 
@@ -74,4 +77,6 @@ public class MenuController implements Initializable {
         client.sendMessage("GET_ONLINE_PLAYERS");
         Functions.naviagteTo("fxml/onlinePlayers");
     }
+
+
 }
