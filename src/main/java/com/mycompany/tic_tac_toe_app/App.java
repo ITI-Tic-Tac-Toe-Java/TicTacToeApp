@@ -7,34 +7,28 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import javafx.scene.text.Font;
 
 public class App extends Application {
 
-    private static Scene scene;
-    
     @Override
     public void start(Stage stage) throws IOException {
-        scene = new Scene(loadFXML("fxml/login"), 1440, 1024);
+        Font.loadFont(getClass().getResourceAsStream("/com/mycompany/tic_tac_toe_app/fonts/Minecraft.ttf"), 10);
+        Parent root = FXMLLoader.load(getClass().getResource("/com/mycompany/tic_tac_toe_app/fxml/mainlayout.fxml"));
+
+        Scene scene = new Scene(root, 1280, 720);
+
+        stage.setTitle("Tic Tac Toe Pixel");
         stage.setScene(scene);
         stage.show();
     }
-    
+
     @Override
     public void stop() {
         System.exit(0);
     }
 
-    public static void setRoot(String fxml) throws IOException {
-        scene.setRoot(loadFXML(fxml));
-    }
-
-    private static Parent loadFXML(String fxml) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
-        return fxmlLoader.load();
-    }
-
     public static void main(String[] args) {
         launch();
     }
-
 }

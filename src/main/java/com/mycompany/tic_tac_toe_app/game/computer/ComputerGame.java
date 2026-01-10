@@ -8,9 +8,9 @@ import com.mycompany.tic_tac_toe_app.game.util.OfflineGameStrategy;
 import javafx.util.Pair;
 
 public class ComputerGame extends OfflineGameStrategy {
-    
+
     private int depth;
-    
+
     public ComputerGame(
             GameListener gameListener,
             GameListenerImpl.OnMoveListener onMoveListener,
@@ -33,13 +33,12 @@ public class ComputerGame extends OfflineGameStrategy {
 
     @Override
     public boolean checkGameStatus(int player) {
-        if (game.hasPlayerWon(player)) {
-            gameListener.onGameOver(player == X ? "win.mp4" : "lose.mp4", onResultListener);
+        if (game.checkWin(player)) {
+            gameListener.onGameOver(player == X ? "WIN" : "LOSE", onResultListener);
             return true;
         }
-
         if (game.isDraw()) {
-            gameListener.onGameOver("draw.mp4", onResultListener);
+            gameListener.onGameOver("DRAW", onResultListener);
             return true;
         }
         return false;
@@ -92,10 +91,10 @@ public class ComputerGame extends OfflineGameStrategy {
 
     private int minimax(int depth, boolean isMax) {
 
-        if (game.hasPlayerWon(O)) {
+        if (game.checkWin(O)) {
             return 10;
         }
-        if (game.hasPlayerWon(X)) {
+        if (game.checkWin(X)) {
             return -10;
         }
         if (game.isDraw() || depth == 0) {
