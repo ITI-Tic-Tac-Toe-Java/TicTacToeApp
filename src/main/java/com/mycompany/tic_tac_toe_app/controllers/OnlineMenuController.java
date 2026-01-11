@@ -42,7 +42,7 @@ public class OnlineMenuController implements Initializable {
     @FXML
     private void handleMultiplayerGame(ActionEvent event) {
         GameController.setGameMode(GameMode.LOCAL_MULTIPLAYER);
-        Router.getInstance().navigateTo("game");
+        Router.getInstance().navigateTo("setPlayersName");
     }
 
     @FXML

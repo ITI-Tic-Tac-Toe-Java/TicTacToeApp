@@ -15,6 +15,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
+import javafx.application.Platform;
 
 public class MainController implements Initializable {
 
@@ -30,27 +31,24 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        setupBackgroundVideo();
-
+        //setupBackgroundVideo();
         PauseTransition delay = new PauseTransition(Duration.seconds(1));
         delay.setOnFinished(event -> playSplashAnimation());
         delay.play();
     }
 
     private void setupBackgroundVideo() {
-        try {
-            Media media = new Media(getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/background.mp4").toExternalForm());
-            MediaPlayer player = new MediaPlayer(media);
-            player.setCycleCount(MediaPlayer.INDEFINITE);
-            player.play();
-            mediaView.setMediaPlayer(player);
+        Media media = new Media(getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/background.mp4").toExternalForm());
+        MediaPlayer player = new MediaPlayer(media);
+        player.setCycleCount(MediaPlayer.INDEFINITE);
+        player.play();
 
+        // Update the MediaView on the JavaFX Application Thread
+        Platform.runLater(() -> {
+            mediaView.setMediaPlayer(player);
             mediaView.fitWidthProperty().bind(contentPane.widthProperty());
             mediaView.fitHeightProperty().bind(contentPane.heightProperty());
-
-        } catch (Exception e) {
-            System.out.println("Error loading video: " + e.getMessage());
-        }
+        });
     }
 
     private void playSplashAnimation() {
@@ -79,5 +77,4 @@ public class MainController implements Initializable {
 
         st.play();
     }
-
 }
