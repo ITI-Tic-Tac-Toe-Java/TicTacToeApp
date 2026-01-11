@@ -23,6 +23,9 @@ public class SetPlayersNameController implements Initializable {
 
     @FXML
     private void handleStartGame(ActionEvent event) {
+
+        GameController.setPlayerX(playerXName.getText());
+        GameController.setPlayerO(playerOName.getText());
         Router.getInstance().navigateTo("game");
     }
 
@@ -30,5 +33,4 @@ public class SetPlayersNameController implements Initializable {
     private void handleBackToMenu(ActionEvent event) {
         Router.getInstance().goBack();
     }
-
 }

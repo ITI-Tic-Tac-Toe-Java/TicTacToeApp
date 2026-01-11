@@ -13,7 +13,7 @@ public class Router {
 
     private Object currentController;
 
-    private static final Router instance = new Router();
+    private static Router instance;
     private StackPane rootPane;
     private StackPane viewContainer;
     private static final String FXML_PATH = "/com/mycompany/tic_tac_toe_app/fxml/";
@@ -24,6 +24,10 @@ public class Router {
     }
 
     public static Router getInstance() {
+        if(instance == null){
+            instance = new Router();
+        }
+        
         return instance;
     }
 

@@ -19,13 +19,17 @@ public class LocalGame extends OfflineGameStrategy {
         if (isX) {
             game.makeMove(row, col, X);
             gameListener.onPlayerMove(row, col, "X", onMoveListener);
+            if (checkGameStatus(X)) {
+                return;
+            }
         } else {
             game.makeMove(row, col, O);
             gameListener.onPlayerMove(row, col, "O", onMoveListener);
+            if (checkGameStatus(O)) {
+                return;
+            }
         }
         isX = !isX;
-        checkGameStatus(1);
-        checkGameStatus(2);
     }
 
     public boolean checkGameStatus(int player) {

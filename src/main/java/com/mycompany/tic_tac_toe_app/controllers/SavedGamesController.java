@@ -1,5 +1,6 @@
 package com.mycompany.tic_tac_toe_app.controllers;
 
+import com.mycompany.tic_tac_toe_app.game.util.GameMode;
 import com.mycompany.tic_tac_toe_app.util.Router;
 import java.io.File;
 import java.net.URL;
@@ -20,10 +21,8 @@ public class SavedGamesController implements Initializable {
 
         listView.getSelectionModel().selectedItemProperty().addListener((obs, oldVal, newVal) -> {
             if (newVal != null && !newVal.equals("No Saved Games To Show")) {
-                // 1. نرسل المسار للـ GameController قبل الانتقال
                 GameController.setReplayPath(newVal);
-
-                // 2. ننتقل لصفحة اللعبة، وهي ستعرف تلقائياً أنها في وضع Replay
+                GameController.setGameMode(GameMode.SAVED_GAME);
                 Router.getInstance().navigateTo("game");
             }
         });

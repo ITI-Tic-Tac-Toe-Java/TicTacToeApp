@@ -11,7 +11,6 @@ import javafx.util.Pair;
 public class XOGameLogic {
 
     public final static class Symbol {
-
         public static final int EMPTY = 0;
         public static final int X = 1;
         public static final int O = 2;

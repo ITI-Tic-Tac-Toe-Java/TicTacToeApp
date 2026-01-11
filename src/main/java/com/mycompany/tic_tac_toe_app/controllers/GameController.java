@@ -7,12 +7,14 @@ import com.mycompany.tic_tac_toe_app.game.computer.ComputerGame;
 import com.mycompany.tic_tac_toe_app.game.local_multiplay.LocalGame;
 import com.mycompany.tic_tac_toe_app.game.util.GameListener;
 import com.mycompany.tic_tac_toe_app.game.online_mode.OnlineGame;
+import com.mycompany.tic_tac_toe_app.game.saved_game.SavedGame;
 import com.mycompany.tic_tac_toe_app.game.util.OfflineGameStrategy;
 import com.mycompany.tic_tac_toe_app.network.Client;
 import com.mycompany.tic_tac_toe_app.network.ClientProtocol;
 import com.mycompany.tic_tac_toe_app.util.Functions;
 import com.mycompany.tic_tac_toe_app.util.Router;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 import javafx.animation.PauseTransition;
 import javafx.event.ActionEvent;
@@ -35,35 +37,67 @@ public class GameController implements Initializable {
     @FXML
     private Button _00, _01, _02, _10, _11, _12, _20, _21, _22;
 
+    private static String playerXName;
+    private static String playerOName;
     private Button[][] boardButtons;
     private GameStrategy gameStrategy;
     private GameListener gameListener;
     private MediaPlayer mediaPlayer;
     private static GameMode currentMode;
     private static int aiDepth = 3;
-    private String lastGameSteps = "";
 
-    private boolean isReplayMode = false;
-    private static String replayFilePath = null;
+    private static String replayFilePath = "";
 
     public static void setReplayPath(String path) {
         replayFilePath = path;
     }
 
+    public static void setPlayerX(String name) {
+        playerXName = name;
+    }
+    
+    public static void setPlayerO(String name) {
+        playerOName = name;
+    }
+
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        playerName.setText(playerXName + " : X");
         boardButtons = new Button[][]{{_00, _01, _02}, {_10, _11, _12}, {_20, _21, _22}};
+        setupNormalGame();
+    }
 
-        if (replayFilePath != null) {
-            this.isReplayMode = true;
-            String fileToRead = replayFilePath;
-            replayFilePath = null;
+    private void setupNormalGame() {
+        if (currentMode == null) {
+            currentMode = GameMode.LOCAL_MULTIPLAYER;
+        }
+        gameListener = new GameListenerImpl();
 
-            prepareBoardForReplay();
-            new Thread(() -> startReplayLogic(fileToRead)).start();
-        } else {
-            this.isReplayMode = false;
-            setupNormalGame();
+        switch (currentMode) {
+            case SINGLE_PLAYER:
+                gameStrategy = new ComputerGame(gameListener, this::onMove, this::showResult, aiDepth);
+                break;
+            case LOCAL_MULTIPLAYER:
+                gameStrategy = new LocalGame(gameListener, this::onMove, this::showResult);
+                break;
+            case ONLINE_MULTIPLAYER:
+                gameStrategy = new OnlineGame(gameListener, this::onMove, this::showResult);
+                ClientProtocol.getInstance().setOnlineGame((OnlineGame) gameStrategy);
+                break;
+
+            case SAVED_GAME:
+                prepareBoardForReplay();
+                gameStrategy = new SavedGame(gameListener, this::updateBoardFromReplay, (res, list) -> {
+                    Functions.showInformationAlert("Replay Finished", "The game replay has ended.");
+                    Router.getInstance().goBack();
+                });
+
+                ((SavedGame) gameStrategy).setReplayPath(replayFilePath);
+                new Thread(
+                        () -> {
+                            ((SavedGame) gameStrategy).startReplayLogic();
+                        }
+                ).start();
         }
     }
 
@@ -78,57 +112,8 @@ public class GameController implements Initializable {
         }
     }
 
-    private void startReplayLogic(String fileName) {
-        try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(fileName))) {
-            String line = reader.readLine();
-            if (line != null && !line.isEmpty()) {
-                String[] moves = line.split(";");
-                for (String move : moves) {
-
-                    String[] parts = move.split(":");
-                    String[] coords = parts[1].split(",");
-                    int row = Integer.parseInt(coords[0]);
-                    int col = Integer.parseInt(coords[1]);
-                    String symbol = coords[2];
-
-                    Platform.runLater(() -> updateBoardFromReplay(row, col, symbol));
-                    Thread.sleep(1000);
-                }
-                Platform.runLater(() -> {
-                    Functions.showInformationAlert("Replay Finished", "The game replay has ended.");
-                    isReplayMode = false;
-                });
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setupNormalGame() {
-        if (currentMode == null) {
-            currentMode = GameMode.LOCAL_MULTIPLAYER;
-        }
-        gameListener = new GameListenerImpl(currentMode);
-
-        switch (currentMode) {
-            case SINGLE_PLAYER:
-                gameStrategy = new ComputerGame(gameListener, this::onMove, this::showResult, aiDepth);
-                break;
-            case LOCAL_MULTIPLAYER:
-                gameStrategy = new LocalGame(gameListener, this::onMove, this::showResult);
-                break;
-            case ONLINE_MULTIPLAYER:
-                gameStrategy = new OnlineGame(gameListener, this::onMove, this::showResult);
-                ClientProtocol.getInstance().setOnlineGame((OnlineGame) gameStrategy);
-                break;
-        }
-    }
-
     @FXML
     private void handleMove(ActionEvent event) {
-        if (isReplayMode) {
-            return;
-        }
         Button clickedButton = (Button) event.getSource();
         String id = clickedButton.getId();
         int r = id.charAt(1) - '0';
@@ -152,17 +137,17 @@ public class GameController implements Initializable {
             if (btn != null) {
                 btn.setText(symbol);
                 btn.setDisable(true);
+                if(symbol.equals("X")) playerName.setText(playerOName + " : O");
+                else playerName.setText(playerXName + " : X");
             }
         });
     }
 
-    public void showResult(String result) {
+    public void showResult(String result, List<int[]> onlineWinningCoords) {
         Platform.runLater(() -> {
             String videoFile = "";
             String colorStyle = "";
-            String status = result.replace(".mp4", "").toUpperCase();
-
-            switch (status) {
+            switch (result) {
                 case "WIN":
                     videoFile = "win.mp4";
                     colorStyle = "-fx-background-color: #39e639; -fx-text-fill: white;";
@@ -174,25 +159,33 @@ public class GameController implements Initializable {
                 case "DRAW":
                     videoFile = "draw.mp4";
                     break;
+                case "OPPONENT_LEFT":
+                    Functions.showErrorAlert(new Exception("Your opponent has disconnected!, The game Ended"));
+                    Router.getInstance().navigateTo("onlineMenu");
+                    ClientProtocol.getInstance().setOnlineGame(null);
+                    return;
             }
 
-            if (!colorStyle.isEmpty() && gameStrategy instanceof OfflineGameStrategy) {
+            final String finalVideo = videoFile;
+            PauseTransition pause = new PauseTransition(Duration.millis(600));
+            pause.setOnFinished(e -> {
+                if (!finalVideo.isEmpty()) {
+                    playVideoOverlay(finalVideo);
+                }
+            });
+            pause.play();
+
+            if (currentMode == GameMode.ONLINE_MULTIPLAYER) {
+                for (int[] coord : onlineWinningCoords) {
+                    boardButtons[coord[0]][coord[1]].setStyle(colorStyle + " -fx-opacity: 0.8;");
+                }
+            } else {
                 var winningCoords = ((OfflineGameStrategy) gameStrategy).getGameLogic().getWinningCoords();
                 for (Pair<Integer, Integer> coord : winningCoords) {
                     boardButtons[coord.getKey()][coord.getValue()].setStyle(colorStyle + " -fx-opacity: 0.8;");
                 }
             }
 
-            final String finalVideo = videoFile;
-            javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(javafx.util.Duration.millis(600));
-            pause.setOnFinished(e -> {
-                if (!finalVideo.isEmpty()) {
-                    playVideoOverlay(finalVideo);
-                } else {
-                    askToPlayAgain();
-                }
-            });
-            pause.play();
         });
     }
 
@@ -220,53 +213,12 @@ public class GameController implements Initializable {
             delay.setOnFinished(e -> {
                 mediaPlayer.stop();
                 rootPane.getChildren().remove(videoOverlay);
-                if (currentMode == GameMode.ONLINE_MULTIPLAYER && !lastGameSteps.isEmpty()) {
-                    askToSaveGame();
-                } else {
-                    askToPlayAgain();
-                }
+                Router.getInstance().navigateTo("onlineMenu");
             });
             delay.play();
         } catch (Exception e) {
             e.printStackTrace();
         }
-    }
-
-    private void askToSaveGame() {
-        Functions.showConfirmAlert("Save Match", null, "Would you like to save this match replay?", "Yes", "No",
-                () -> {
-                    ((OnlineGame) gameStrategy).saveReplayToFile(lastGameSteps);
-                    lastGameSteps = "";
-                    askToPlayAgain();
-                    return null;
-                },
-                () -> {
-                    lastGameSteps = "";
-                    askToPlayAgain();
-                    return null;
-                }
-        );
-    }
-
-    private void askToPlayAgain() {
-        Functions.showConfirmAlert("Match Ended", null, "Do you want to play again?", "Yes", "No",
-                () -> {
-                    if (currentMode == GameMode.ONLINE_MULTIPLAYER) {
-                        Client.getInstance().sendMessage("MOVE:REPLAY_REQUEST");
-                    } else {
-                        Router.getInstance().goBack();
-                        Platform.runLater(() -> Router.getInstance().navigateTo("game"));
-                    }
-                    return null;
-                },
-                () -> {
-                    if (currentMode == GameMode.ONLINE_MULTIPLAYER) {
-                        Client.getInstance().sendMessage("MOVE:QUIT_MATCH");
-                    }
-                    Platform.runLater(() -> Router.getInstance().navigateTo("onlineMenu"));
-                    return null;
-                }
-        );
     }
 
     @FXML
@@ -289,7 +241,4 @@ public class GameController implements Initializable {
         aiDepth = depth;
     }
 
-    public void setLastGameSteps(String steps) {
-        this.lastGameSteps = steps;
-    }
 }

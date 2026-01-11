@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import javafx.application.Platform;
+import javafx.util.Pair;
 
 public class ClientProtocol {
 
@@ -71,7 +72,7 @@ public class ClientProtocol {
                 break;
 
             case GAME_START:
-                onGameStart();
+                onGameStart(parts);
                 break;
 
             case MOVE_VALID:
@@ -118,17 +119,18 @@ public class ClientProtocol {
             case REPLAY_REQUESTED_BY:
                 onReceiveReplayRequest(parts[1], client);
                 break;
-
+                
             case SAVE_REPLAY_DATA:
                 if (parts.length > 1) {
                     String steps = parts[1];
-                    Object controller = Router.getInstance().getCurrentController();
-                    if (controller instanceof GameController) {
-                        ((GameController) controller).setLastGameSteps(steps);
+                    // Store the steps in OnlineGame so it's ready when the game ends
+                    if (onlineGame != null && onlineGame.isSaveable) {
+                        onlineGame.saveReplayToFile(steps);
                     }
+
                 }
                 break;
-                
+
             default:
                 break;
         }
@@ -143,22 +145,82 @@ public class ClientProtocol {
             int r = Integer.parseInt(parts[1]);
             int c = Integer.parseInt(parts[2]);
             String sym = parts[3];
-            onlineGame.getGameListener().onPlayerMove(r, c, sym, onlineGame.getOnMoveListener());
+            onlineGame.getOnMoveListener().onMove(r, c, sym);
         }
     }
 
-    private void onGameStart() {
+    private void onGameStart(String[] parts) {
+        String sym = parts[1];
+        String opponentName = parts[2];
         GameController.setGameMode(GameMode.ONLINE_MULTIPLAYER);
+
+        GameController.setPlayerX((sym.equals("X")) ? Client.getInstance().getPlayer().getUserName() : opponentName);
+        GameController.setPlayerO((sym.equals("O")) ? Client.getInstance().getPlayer().getUserName() : opponentName);
+        askToSaveGame();
         Router.getInstance().navigateTo("game");
     }
 
     private void onGameOver(String[] parts, Client client) {
+        // parts structure:
+        // WIN -> [GAME_OVER, WIN, Score, CoordsString]
+        // LOSE -> [GAME_OVER, LOSE, CoordsString]
+        // DRAW -> [GAME_OVER, DRAW, Score]
+
+        String result = parts[1];
+        String coordsString = "";
+
         if (onlineGame.getGameListener() != null && parts.length >= 2) {
-            if (parts.length > 2) {
+
+            // Handle Score update for Winner/Draw
+            if (result.equals("WIN") && parts.length > 2) {
+                client.getPlayer().setScore(Integer.parseInt(parts[2]));
+            } else if (result.equals("DRAW") && parts.length > 2) {
                 client.getPlayer().setScore(Integer.parseInt(parts[2]));
             }
-            Platform.runLater(() -> onlineGame.getGameListener().onGameOver(parts[1], onlineGame.getOnResultListener()));
+
+            // Extract Coordinates Logic
+            if (result.equals("WIN") && parts.length > 3) {
+                coordsString = parts[3];
+            } else if (result.equals("LOSE") && parts.length > 2) {
+                coordsString = parts[2];
+            }
+
+            // Parse coordinates back to a usable list
+            List<int[]> winningLine = parseWinningCoords(coordsString);
+
+            // Notify UI
+            final String finalResult = result; // for lambda
+            final List<int[]> finalWinningLine = winningLine; // for lambda
+
+            Platform.runLater(() -> {
+                onlineGame.getOnResultListener().showResult(finalResult, finalWinningLine);
+            });
+
         }
+
+    }
+
+    // Add this helper method to ClientProtocol
+    private List<int[]> parseWinningCoords(String coordsData) {
+        List<int[]> list = new ArrayList<>();
+        if (coordsData == null || coordsData.isEmpty()) {
+            return list;
+        }
+
+        String[] pairs = coordsData.split(";"); // Split into ["0,0", "0,1", "0,2"]
+        for (String pair : pairs) {
+            String[] xy = pair.split(","); // Split into ["0", "0"]
+            if (xy.length == 2) {
+                try {
+                    int r = Integer.parseInt(xy[0]);
+                    int c = Integer.parseInt(xy[1]);
+                    list.add(new int[]{r, c});
+                } catch (NumberFormatException e) {
+                    // Ignore malformed data
+                }
+            }
+        }
+        return list;
     }
 
     private void onLoginSuccess(String[] parts, Client client) {
@@ -224,6 +286,7 @@ public class ClientProtocol {
     }
 
     private void onInviteAccepted() {
+
         Router.getInstance().navigateTo("game");
     }
 
@@ -257,6 +320,22 @@ public class ClientProtocol {
                 updatePlayerList.accept(new ArrayList<>(players));
             });
         }
+
+    }
+
+    private void askToSaveGame() {
+        Functions.showConfirmAlert(
+                "Save Match", null,
+                "Would you like to save this match replay?", "Yes", "No",
+                () -> {
+                    onlineGame.isSaveable = true;
+                    return null;
+                },
+                () -> {
+                    onlineGame.isSaveable = false;
+                    return null;
+                }
+        );
     }
 
     private void onReceiveReplayRequest(String opponentName, Client client) {
@@ -279,33 +358,6 @@ public class ClientProtocol {
                     }
             );
         });
-    }
-
-    private void handleSaveReplayRequest(String steps) {
-        Platform.runLater(() -> {
-            Functions.showConfirmAlert(
-                    "Save A Game",
-                    null,
-                    "Do you want to save this game?",
-                    "Yes, Save",
-                    "Noً",
-                    () -> {
-                        saveStepsToFile(steps);
-                        return true;
-                    },
-                    () -> null
-            );
-        });
-    }
-
-    private void saveStepsToFile(String data) {
-        String fileName = "replay_" + System.currentTimeMillis() + ".txt";
-        try (java.io.BufferedWriter writer = new java.io.BufferedWriter(new java.io.FileWriter(fileName))) {
-            writer.write(data);
-            Functions.showInformationAlert("Game Saved", "the Game was saved in File: " + fileName);
-        } catch (java.io.IOException e) {
-            Functions.showErrorAlert(e);
-        }
     }
 
     public List<String> getSavedGames() {

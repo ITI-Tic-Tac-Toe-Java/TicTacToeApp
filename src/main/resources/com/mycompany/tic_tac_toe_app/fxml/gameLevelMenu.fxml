@@ -11,7 +11,7 @@
            prefHeight="350.0" prefWidth="350.0"
            styleClass="transparent-pane" stylesheets="@../styles/style.css"
            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-           fx:controller="com.mycompany.tic_tac_toe_app.controllers.ComputerMenuController">
+           fx:controller="com.mycompany.tic_tac_toe_app.controllers.GameLevelMenuController">
            
     <VBox alignment="CENTER" maxWidth="280" spacing="15">
         <Label styleClass="label" text="TIC TAC YOU" />

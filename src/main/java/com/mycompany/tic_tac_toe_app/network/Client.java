@@ -13,7 +13,7 @@ public class Client extends Thread {
 
     private PlayerDTO player;
     private final int port = 5008;
-    private final String localHost = "localhost";
+    private final String localHost = "10.191.242.48";
     private PrintStream ps;
     private BufferedReader br;
     private Socket socket;
@@ -67,17 +67,6 @@ public class Client extends Thread {
         if (ps != null) {
             ps.println(msg);
             ps.flush();
-        }
-    }
-
-    private void closeResources() {
-        try {
-            ps.flush();
-            ps.close();
-            br.close();
-            socket.close();
-        } catch (IOException ex) {
-            Platform.runLater(() -> Functions.showErrorAlert(new IOException("Error in closing resources")));
         }
     }
 }
