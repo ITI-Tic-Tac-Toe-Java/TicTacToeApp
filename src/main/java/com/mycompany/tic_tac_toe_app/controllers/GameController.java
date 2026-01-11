@@ -33,9 +33,10 @@ import javafx.util.Pair;
 public class GameController implements Initializable {
 
     @FXML
-    private Button _00, _01, _02, _10, _11, _12, _20, _21, _22;
-    @FXML
     private Label playerName;
+    @FXML
+    private Button _00, _01, _02, _10, _11, _12, _20, _21, _22;
+
     private static String playerXName;
     private static String playerOName;
     private Button[][] boardButtons;
@@ -44,6 +45,7 @@ public class GameController implements Initializable {
     private MediaPlayer mediaPlayer;
     private static GameMode currentMode;
     private static int aiDepth = 3;
+
     private static String replayFilePath = "";
 
     public static void setReplayPath(String path) {

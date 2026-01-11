@@ -31,7 +31,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //setupBackgroundVideo();
+        setupBackgroundVideo();
         PauseTransition delay = new PauseTransition(Duration.seconds(1));
         delay.setOnFinished(event -> playSplashAnimation());
         delay.play();

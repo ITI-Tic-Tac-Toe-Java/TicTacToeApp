@@ -36,7 +36,9 @@ public class OnlineMenuController implements Initializable {
     @FXML
     private void handleComputerGame(ActionEvent event) {
         GameController.setGameMode(GameMode.SINGLE_PLAYER);
-        Router.getInstance().navigateTo("computerMenu");
+        GameController.setPlayerX("YOU");
+        GameController.setPlayerO("Computer");
+        Router.getInstance().navigateTo("gameLevelMenu");
     }
 
     @FXML
@@ -60,6 +62,7 @@ public class OnlineMenuController implements Initializable {
     @FXML
     private void handleLogout(ActionEvent event) {
         Router.getInstance().clearHistory();
+        client.sendMessage("LOGOUT");
         Router.getInstance().navigateTo("login");
     }
 
