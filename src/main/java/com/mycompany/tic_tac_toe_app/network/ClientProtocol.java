@@ -119,7 +119,7 @@ public class ClientProtocol {
             case REPLAY_REQUESTED_BY:
                 onReceiveReplayRequest(parts[1], client);
                 break;
-
+                
             case SAVE_REPLAY_DATA:
                 if (parts.length > 1) {
                     String steps = parts[1];
