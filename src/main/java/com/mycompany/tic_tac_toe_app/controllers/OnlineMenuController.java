@@ -36,6 +36,8 @@ public class OnlineMenuController implements Initializable {
     @FXML
     private void handleComputerGame(ActionEvent event) {
         GameController.setGameMode(GameMode.SINGLE_PLAYER);
+        GameController.setPlayerX("YOU");
+        GameController.setPlayerO("Computer");
         Router.getInstance().navigateTo("gameLevelMenu");
     }
 
