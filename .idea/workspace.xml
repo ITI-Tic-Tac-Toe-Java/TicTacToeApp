@@ -1,34 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="tic_tac_toe_app:jar" />
+    </artifacts-to-build>
+  </component>
   <component name="AutoImportSettings">
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
     <list default="true" id="dc0fe693-0ad6-4acb-9bfe-77b7ca39ee02" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/App.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/App.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/GameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/GameController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/InvetationController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/LoginController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/MenuController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/MenuController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/OnlinePlayersController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/OnlinePlayersControllerTemp.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/RegisterController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/SavedGamesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/controllers/SavedGamesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/model/service/computer/ComputerGame.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/model/service/local_multiplay/LocalGame.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/model/service/online_mode/OnlineGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/model/service/online_mode/OnlineGame.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/network/ClientProtocol.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/network/ClientProtocol.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/util/Functions.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/com/mycompany/tic_tac_toe_app/util/Functions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/game.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/game.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/invetation.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/login.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/menu.fxml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/onlinePlayers.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/onlinePlayers.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/register.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/savedGames.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/fxml/savedGames.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/styles/menu.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/styles/style.css" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/styles/style.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/videos/draw.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/media/draw.mp4" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/videos/win.mp4" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/com/mycompany/tic_tac_toe_app/media/win.mp4" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -38,31 +20,39 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 3
-}]]></component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 3
+}</component>
   <component name="ProjectId" id="382Ly22MJ29IE7ddv05wzh7NM1k" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.App.executor": "Run",
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "git-widget-placeholder": "albaraa",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "/Users/moca/NetBeansProjects/final project/TicTacToeApp"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.App.executor&quot;: &quot;Run&quot;,
+    &quot;ModuleVcsDetector.initialDetectionPerformed&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;/Users/moca/NetBeansProjects/final project/tic_tac/TicTacToeApp&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager">
     <configuration default="true" type="JetRunConfigurationType">
       <module name="TicTacToeApp" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType">
+      <module name="TicTacToeApp" />
+      <option name="filePath" />
+      <method v="2" />
     </configuration>
   </component>
   <component name="TaskManager">

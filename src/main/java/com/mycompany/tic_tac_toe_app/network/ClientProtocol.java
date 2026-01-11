@@ -12,7 +12,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
+import javafx.animation.PauseTransition;
 import javafx.application.Platform;
+import javafx.util.Duration;
 import javafx.util.Pair;
 
 public class ClientProtocol {
@@ -119,7 +121,7 @@ public class ClientProtocol {
             case REPLAY_REQUESTED_BY:
                 onReceiveReplayRequest(parts[1], client);
                 break;
-                
+
             case SAVE_REPLAY_DATA:
                 if (parts.length > 1) {
                     String steps = parts[1];
@@ -138,6 +140,11 @@ public class ClientProtocol {
 
     private void onError(String message) {
         Functions.showErrorAlert(new Exception(message));
+        if (message.equals("SERVER_DISCONNECT")) {
+            PauseTransition delay = new PauseTransition(Duration.seconds(3));
+            delay.setOnFinished(event -> System.exit(0));
+            delay.play();
+        }
     }
 
     private void onMoveValid(String[] parts) {

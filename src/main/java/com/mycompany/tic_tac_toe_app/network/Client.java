@@ -2,6 +2,7 @@ package com.mycompany.tic_tac_toe_app.network;
 
 import com.mycompany.tic_tac_toe_app.model.PlayerDTO;
 import com.mycompany.tic_tac_toe_app.util.Functions;
+import com.mycompany.tic_tac_toe_app.util.Router;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -59,7 +60,8 @@ public class Client extends Thread {
                 cp.processMessage(msg, this);
             }
         } catch (IOException ex) {
-            Functions.showErrorAlert(new IOException("Error In Receving Message"));
+            Functions.showErrorAlert(new IOException("Server Disconnected"));
+            Router.getInstance().navigateTo("guestMenu");
         }
     }
 

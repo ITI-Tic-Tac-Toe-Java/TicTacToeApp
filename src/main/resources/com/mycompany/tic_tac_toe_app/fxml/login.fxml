@@ -8,9 +8,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.layout.VBox?>
 
-<StackPane prefHeight="350" prefWidth="350" style="-fx-background-color: transparent;"
-           stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/25"
-           xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tic_tac_toe_app.controllers.LoginController">
+<StackPane prefHeight="350" prefWidth="350" style="-fx-background-color: transparent;" stylesheets="@../styles/style.css" xmlns="http://javafx.com/javafx/25" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.mycompany.tic_tac_toe_app.controllers.LoginController">
 
     <VBox alignment="CENTER" maxWidth="280" spacing="15" styleClass="main-container">
         
@@ -20,7 +18,7 @@
         <PasswordField fx:id="passwordField" promptText="Password" styleClass="text-field" />
         
         <VBox spacing="10">
-            <Button maxWidth="Infinity" onAction="#handleLogin" styleClass="button" text="Login" />
+            <Button defaultButton="true" maxWidth="Infinity" onAction="#handleLogin" styleClass="button" text="Login" />
             <Button maxWidth="Infinity" onAction="#handleGuist" styleClass="button" text="Join as Guest" />
         </VBox>
 
