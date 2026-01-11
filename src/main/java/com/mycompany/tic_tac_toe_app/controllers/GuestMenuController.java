@@ -10,8 +10,8 @@ public class GuestMenuController {
     @FXML
     private void handleComputerGame(ActionEvent event) {
         GameController.setGameMode(GameMode.SINGLE_PLAYER);
-        GameController.setPlayerX("YOU : X");
-        GameController.setPlayerO("Computer : O");
+        GameController.setPlayerX("YOU");
+        GameController.setPlayerO("Computer");
 
         Router.getInstance().navigateTo("gameLevelMenu");
     }
