@@ -55,7 +55,7 @@ public class GameController implements Initializable {
     public static void setPlayerX(String name) {
         playerXName = name;
     }
-    
+
     public static void setPlayerO(String name) {
         playerOName = name;
     }
@@ -137,8 +137,11 @@ public class GameController implements Initializable {
             if (btn != null) {
                 btn.setText(symbol);
                 btn.setDisable(true);
-                if(symbol.equals("X")) playerName.setText(playerOName + " : O");
-                else playerName.setText(playerXName + " : X");
+                if (symbol.equals("X")) {
+                    playerName.setText(playerOName + " : O");
+                } else {
+                    playerName.setText(playerXName + " : X");
+                }
             }
         });
     }
@@ -147,6 +150,7 @@ public class GameController implements Initializable {
         Platform.runLater(() -> {
             String videoFile = "";
             String colorStyle = "";
+
             switch (result) {
                 case "WIN":
                     videoFile = "win.mp4";
@@ -167,14 +171,16 @@ public class GameController implements Initializable {
             }
 
             final String finalVideo = videoFile;
+
             PauseTransition pause = new PauseTransition(Duration.millis(600));
             pause.setOnFinished(e -> {
                 if (!finalVideo.isEmpty()) {
-                    playVideoOverlay(finalVideo);
+                    playVideoOverlayWithRetry(finalVideo, 3);
                 }
             });
             pause.play();
 
+            // highlight
             if (currentMode == GameMode.ONLINE_MULTIPLAYER) {
                 for (int[] coord : onlineWinningCoords) {
                     boardButtons[coord[0]][coord[1]].setStyle(colorStyle + " -fx-opacity: 0.8;");
@@ -185,39 +191,124 @@ public class GameController implements Initializable {
                     boardButtons[coord.getKey()][coord.getValue()].setStyle(colorStyle + " -fx-opacity: 0.8;");
                 }
             }
-
         });
     }
 
-    private void playVideoOverlay(String videoFile) {
-        try {
-            URL videoUrl = getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/" + videoFile);
-            if (videoUrl == null) {
-                return;
+    /* =========================
+   RETRY VIDEO OVERLAY LOGIC
+   ========================= */
+    private void playVideoOverlayWithRetry(String videoFile, int maxAttempts) {
+        URL videoUrl = getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/" + videoFile);
+        if (videoUrl == null) {
+            System.out.println("Video not found: " + videoFile);
+            return;
+        }
+
+        // Create overlay ONCE (don’t recreate each retry)
+        StackPane rootPane = Router.getInstance().getRootPane();
+
+        MediaView dynamicVideoView = new MediaView();
+        dynamicVideoView.setFitWidth(rootPane.getWidth());
+        dynamicVideoView.setFitHeight(rootPane.getHeight());
+        dynamicVideoView.setPreserveRatio(false);
+
+        StackPane videoOverlay = new StackPane(dynamicVideoView);
+        videoOverlay.setPickOnBounds(true); // blocks clicks through overlay
+        videoOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
+
+        // Prevent interacting with the board under it (extra safety)
+        // (PickOnBounds already helps, but this guarantees no mouse events pass.)
+        videoOverlay.setOnMouseClicked(e -> e.consume());
+        videoOverlay.setOnMousePressed(e -> e.consume());
+        videoOverlay.setOnMouseReleased(e -> e.consume());
+
+        rootPane.getChildren().add(videoOverlay);
+
+        // Start attempts
+        attemptPlayOverlay(videoUrl, dynamicVideoView, videoOverlay, rootPane, 1, maxAttempts);
+    }
+
+    private void attemptPlayOverlay(
+            URL videoUrl,
+            MediaView dynamicVideoView,
+            StackPane videoOverlay,
+            StackPane rootPane,
+            int attempt,
+            int maxAttempts
+    ) {
+        // Clean previous player if exists
+        if (mediaPlayer != null) {
+            try {
+                mediaPlayer.stop();
+                mediaPlayer.dispose();
+            } catch (Exception ignored) {
             }
+            mediaPlayer = null;
+        }
 
-            Media media = new Media(videoUrl.toExternalForm());
-            mediaPlayer = new MediaPlayer(media);
-            MediaView dynamicVideoView = new MediaView(mediaPlayer);
-            StackPane videoOverlay = new StackPane(dynamicVideoView);
-            videoOverlay.setStyle("-fx-background-color: rgba(0, 0, 0, 0.8);");
+        System.out.println("Attempt " + attempt + "/" + maxAttempts + " playing: " + videoUrl);
 
-            StackPane rootPane = Router.getInstance().getRootPane();
-            dynamicVideoView.setFitWidth(rootPane.getWidth());
-            dynamicVideoView.setFitHeight(rootPane.getHeight());
+        Media media = new Media(videoUrl.toExternalForm());
+        mediaPlayer = new MediaPlayer(media);
+        dynamicVideoView.setMediaPlayer(mediaPlayer);
 
-            rootPane.getChildren().add(videoOverlay);
+        // 3 seconds timer to remove overlay + goBack (only after successful play)
+        final PauseTransition endDelay = new PauseTransition(Duration.seconds(3));
+
+        mediaPlayer.setOnReady(() -> {
+            System.out.println("MediaPlayer READY (attempt " + attempt + ")");
             mediaPlayer.play();
 
-            PauseTransition delay = new PauseTransition(Duration.seconds(3));
-            delay.setOnFinished(e -> {
-                mediaPlayer.stop();
+            // Start the overlay lifetime timer only after READY
+            endDelay.setOnFinished(e -> {
+                safeStopDisposePlayer();
                 rootPane.getChildren().remove(videoOverlay);
-                Router.getInstance().navigateTo("onlineMenu");
+                Router.getInstance().goBack();
+                if(currentMode == GameMode.ONLINE_MULTIPLAYER){
+                    Router.getInstance().navigateTo("onlineMenu");
+                }else{
+                    Router.getInstance().navigateTo("guestMenu");
+                }
             });
-            delay.play();
-        } catch (Exception e) {
-            e.printStackTrace();
+            endDelay.play();
+        });
+
+        mediaPlayer.setOnError(() -> {
+            String msg = (mediaPlayer.getError() != null) ? mediaPlayer.getError().getMessage() : "unknown";
+            System.out.println("MediaPlayer ERROR (attempt " + attempt + "): " + msg);
+
+            // cancel timer if it started (maybe READY fired then error)
+            endDelay.stop();
+
+            safeStopDisposePlayer();
+
+            if (attempt < maxAttempts) {
+                // small delay helps gstreamer recover
+                PauseTransition retryDelay = new PauseTransition(Duration.millis(250));
+                retryDelay.setOnFinished(e
+                        -> attemptPlayOverlay(videoUrl, dynamicVideoView, videoOverlay, rootPane, attempt + 1, maxAttempts)
+                );
+                retryDelay.play();
+            } else {
+                // Final failure: remove overlay + go back (or show fallback)
+                rootPane.getChildren().remove(videoOverlay);
+                System.out.println("Failed to play video after " + maxAttempts + " attempts.");
+                Router.getInstance().goBack();
+            }
+        });
+    }
+
+    private void safeStopDisposePlayer() {
+        if (mediaPlayer != null) {
+            try {
+                mediaPlayer.stop();
+            } catch (Exception ignored) {
+            }
+            try {
+                mediaPlayer.dispose();
+            } catch (Exception ignored) {
+            }
+            mediaPlayer = null;
         }
     }
 

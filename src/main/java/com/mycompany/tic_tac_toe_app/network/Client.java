@@ -14,7 +14,7 @@ public class Client extends Thread {
 
     private PlayerDTO player;
     private final int port = 5008;
-    private final String localHost = "10.191.242.48";
+    private final String localHost = "localhost";
     private PrintStream ps;
     private BufferedReader br;
     private Socket socket;

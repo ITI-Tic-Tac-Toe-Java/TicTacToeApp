@@ -24,7 +24,7 @@ public class ComputerGame extends OfflineGameStrategy {
     @Override
     public void createMove(int row, int col) {
         game.makeMove(row, col, X);
-        gameListener.onPlayerMove(row, col, "X", onMoveListener);
+        onMoveListener.onMove(row, col, "X");
         if (checkGameStatus(X)) {
             return;
         }
@@ -34,11 +34,11 @@ public class ComputerGame extends OfflineGameStrategy {
     @Override
     public boolean checkGameStatus(int player) {
         if (game.checkWin(player)) {
-            gameListener.onGameOver(player == X ? "WIN" : "LOSE", onResultListener);
+            onResultListener.showResult(player == X ? "WIN" : "LOSE", null);
             return true;
         }
         if (game.isDraw()) {
-            gameListener.onGameOver("DRAW", onResultListener);
+            onResultListener.showResult("DRAW", null);
             return true;
         }
         return false;

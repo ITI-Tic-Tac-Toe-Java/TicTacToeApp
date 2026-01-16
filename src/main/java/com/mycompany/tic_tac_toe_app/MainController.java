@@ -11,11 +11,14 @@ import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.scene.media.MediaView;
 import javafx.util.Duration;
-import javafx.application.Platform;
+import javafx.scene.media.Media;
+import javafx.scene.media.MediaPlayer;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 public class MainController implements Initializable {
 
@@ -37,18 +40,36 @@ public class MainController implements Initializable {
         delay.play();
     }
 
-    private void setupBackgroundVideo() {
-        Media media = new Media(getClass().getResource("/com/mycompany/tic_tac_toe_app/videos/background.mp4").toExternalForm());
-        MediaPlayer player = new MediaPlayer(media);
-        player.setCycleCount(MediaPlayer.INDEFINITE);
-        player.play();
+    private MediaPlayer player;
 
-        // Update the MediaView on the JavaFX Application Thread
-        Platform.runLater(() -> {
+    private void setupBackgroundVideo() {
+        try {
+            // 1) Load from resources as a stream
+            InputStream is = getClass().getResourceAsStream(
+                    "/com/mycompany/tic_tac_toe_app/videos/background.mp4"
+            );
+            if (is == null) {
+                throw new RuntimeException("background.mp4 not found in resources");
+            }
+
+            // 2) Copy to a unique temp file for THIS instance
+            Path tempVideo = Files.createTempFile("ttt_bg_", ".mp4");
+            Files.copy(is, tempVideo, StandardCopyOption.REPLACE_EXISTING);
+            tempVideo.toFile().deleteOnExit();
+
+            // 3) Play from temp file (each instance has its own file)
+            Media media = new Media(tempVideo.toUri().toString());
+            player = new MediaPlayer(media);
+            player.setCycleCount(MediaPlayer.INDEFINITE);
+            player.play();
+
             mediaView.setMediaPlayer(player);
             mediaView.fitWidthProperty().bind(contentPane.widthProperty());
             mediaView.fitHeightProperty().bind(contentPane.heightProperty());
-        });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void playSplashAnimation() {
